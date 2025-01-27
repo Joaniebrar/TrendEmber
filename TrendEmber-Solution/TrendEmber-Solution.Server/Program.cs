@@ -1,11 +1,62 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using TrendEmber.Core.Authentication;
+using TrendEmber.Core.Identity;
+using TrendEmber.Data;
+using TrendEmber.Service;
+using TrendEmber_Solution.Server.Policy;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// add identity context
+builder.Services.AddDbContext<IdentityContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("IdentityConnection")));
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+        .AddEntityFrameworkStores<IdentityContext>()
+        .AddDefaultTokenProviders();
+
+//add jwt 
+var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettingsSection["SecretKey"] ?? throw new InvalidOperationException("JwtSettings:SecretKey is not configured.");
+var issuer = jwtSettingsSection["Issuer"] ?? throw new InvalidOperationException("JwtSettings:Issuer is not configured.");
+var audience = jwtSettingsSection["Audience"] ?? throw new InvalidOperationException("JwtSettings:Audience is not configured.");
+
+
+var jwtSettings = new JwtSettings(secretKey, issuer, audience);
+builder.Services.AddSingleton(jwtSettings);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = false;
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = issuer,
+                ValidAudience = audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+            };
+        });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(Policy.Admin.ToString(), policy => policy.RequireRole(Roles.Admin.ToString()));
+    options.AddPolicy(Policy.Analyst.ToString(), policy => policy.RequireRole(Roles.Analyst.ToString()));
+});
+
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
@@ -20,6 +71,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TrendEmber-Solution.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3b1acbbf8bd15c98962e9410acc2b459b178e2b7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7e4dd08f98adf6f1966965534fbc7789127590dc")]
 [assembly: System.Reflection.AssemblyProductAttribute("TrendEmber-Solution.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TrendEmber-Solution.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
