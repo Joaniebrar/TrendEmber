@@ -1,0 +1,13 @@
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\bin\Debug\net8.0\TrendEmber.Core.deps.json
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\bin\Debug\net8.0\TrendEmber.Core.dll
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\bin\Debug\net8.0\TrendEmber.Core.pdb
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\obj\Debug\net8.0\TrendEmber.Core.csproj.AssemblyReference.cache
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\obj\Debug\net8.0\TrendEmber.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\obj\Debug\net8.0\TrendEmber.Core.AssemblyInfoInputs.cache
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\obj\Debug\net8.0\TrendEmber.Core.AssemblyInfo.cs
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\obj\Debug\net8.0\TrendEmber.Core.csproj.CoreCompileInputs.cache
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\obj\Debug\net8.0\TrendEmber.Core.sourcelink.json
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\obj\Debug\net8.0\TrendEmber.Core.dll
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\obj\Debug\net8.0\refint\TrendEmber.Core.dll
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\obj\Debug\net8.0\TrendEmber.Core.pdb
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Core\obj\Debug\net8.0\ref\TrendEmber.Core.dll
