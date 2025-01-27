@@ -1,0 +1,6 @@
+@TrendEmber_Solution.Server_HostAddress = http://localhost:5118
+
+GET {{TrendEmber_Solution.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
