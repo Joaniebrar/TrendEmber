@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\TrendEmber-Solution.Server.props" />
+</Project>
