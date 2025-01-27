@@ -14,3 +14,5 @@ C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber
 C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Data\obj\Debug\net8.0\refint\TrendEmber.Data.dll
 C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Data\obj\Debug\net8.0\TrendEmber.Data.pdb
 C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Data\obj\Debug\net8.0\ref\TrendEmber.Data.dll
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Data\bin\Debug\net8.0\TrendEmber.Data.runtimeconfig.json
+C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\TrendEmber.Data\obj\Debug\net8.0\TrendEmber.Data.genruntimeconfig.cache

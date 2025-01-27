@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -79,5 +80,17 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+
+app.MapPost("/token", async (LoginRequest loginRequest, TokenService tokenService, UserManager<ApplicationUser> userManager) =>
+{
+    var user = await userManager.FindByNameAsync(loginRequest.Email);
+    if (user == null || !await userManager.CheckPasswordAsync(user, loginRequest.Password))
+    {
+        return Results.Unauthorized();
+    }
+    var token = tokenService.GenerateJwtToken(user);
+
+    return Results.Ok(new { Token = token });
+});
 
 app.Run();

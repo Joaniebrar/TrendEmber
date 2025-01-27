@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TrendEmber.Service")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7e4dd08f98adf6f1966965534fbc7789127590dc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+34ee37e428086e75b623766be9932826eecc2acc")]
 [assembly: System.Reflection.AssemblyProductAttribute("TrendEmber.Service")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TrendEmber.Service")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
