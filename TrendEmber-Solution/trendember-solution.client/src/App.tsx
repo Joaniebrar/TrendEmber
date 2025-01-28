@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import { AuthProvider } from './authentication/authContext';
 
 interface Forecast {
     date: string;
@@ -39,11 +40,13 @@ function App() {
         </table>;
 
     return (
+        <AuthProvider>
         <div>
             <h1 id="tableLabel">Weather forecast</h1>
             <p>This component demonstrates fetching data from the server.</p>
             {contents}
         </div>
+        </AuthProvider>
     );
 
     async function populateWeatherData() {
