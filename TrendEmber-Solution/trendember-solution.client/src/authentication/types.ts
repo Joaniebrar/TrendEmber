@@ -1,12 +1,24 @@
 // Represents a user object
-export interface User {
-    id: string;
-    name: string;
+export interface User {    
+    fullName: string;
     email: string;
-    role: string; // e.g., "admin", "user", etc.
-    profilePictureUrl?: string; // Optional field
+    roles: string[];    
   }
   
+export interface Token {
+    result: string;
+    id: number;
+    exception: string | null;
+    status: number;
+    isCanceled: boolean;
+    isCompleted: boolean;
+    isCompletedSuccessfully: boolean;
+    creationOptions: number;
+    asyncState: any | null;
+    isFaulted: boolean;
+}
+
+
   // Type for the authentication context
   export interface AuthContextType {
     user: User | null;
@@ -28,5 +40,5 @@ export interface User {
   }
   
   // Define roles if your application uses role-based access
-  export type UserRole = 'admin' | 'user' | 'guest';
+  export type UserRole = 'admin' | 'analyst' | 'guest';
   

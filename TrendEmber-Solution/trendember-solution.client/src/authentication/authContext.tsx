@@ -1,54 +1,64 @@
-import { FC, createContext, useState, useEffect, ReactNode } from 'react';
-import { getUser, loginUser, logoutUser } from './authUtils'; // Import utility functions
-import { User, AuthContextType } from './types'
+import { createContext, useState, ReactNode, useContext, useEffect } from "react";
+import { loginUser } from './authUtils';
+import { logoutUser } from './authUtils';
+import {User} from './types';
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  error: string | null;
+  isLoading: boolean
+}
 
-export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading,setLoading] = useState<boolean>(true);
     useEffect(() => {
-        // Check if the user is already logged in on initial load
-        const fetchUser = async () => {
-            try {
-                const currentUser = await getUser();
-                setUser(currentUser);
-            } catch (error) {
-                console.error('Error fetching user:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUser();
+        const token = localStorage.getItem('authToken');
+        if (token)
+        {
+            setIsAuthenticated(true);
+        }
+        setLoading(false);
     }, []);
-
-    const login = async (email: string, password: string) => {
+    const login = async (email: string, password: string): Promise<boolean> => {
         try {
-            const currentUser = await loginUser(email, password);
-            setUser(currentUser);
-        } catch (error) {
-            throw new Error('Failed to log in.');
+            const token = await loginUser(email,password);            
+            if (token && token.status == 5) {
+                localStorage.setItem('authToken',token.result);
+                setIsAuthenticated(true);
+                setUser({email} as User);
+                setError(null);
+                return true;
+            }
+            return false;
         }
-    };
-
-    const logout = async () => {
-        try {
-            await logoutUser();
+        catch(err) {
+            setError("Login failed. Please try again.");
+            setIsAuthenticated(false);
             setUser(null);
-        } catch (error) {
-            console.error('Error logging out:', error);
+            return false;
         }
     };
 
-    return (
-        <AuthContext.Provider
-          value={{ user, isAuthenticated: !!user, login, logout, loading }}
-        >
-          {!loading && children}
-        </AuthContext.Provider>
-      );
+    const logout = async ()=> {
+        localStorage.removeItem('authToken'); 
+        await logoutUser();
+        setError(null);
+        setUser(null);
+        setIsAuthenticated(false);
     };
     
-    export default AuthContext;
+
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, user, error,login, logout, isLoading}}>
+      {children}
+    </AuthContext.Provider>
+  );
+};

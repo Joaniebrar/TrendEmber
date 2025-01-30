@@ -1,11 +1,85 @@
 ﻿#root {
-    max-width: 1280px;
-    margin: 0 auto;
+    width: 100%;
+    min-height: 100vh; /* Full viewport height */
+    margin: 0;
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
     text-align: center;
+    background-color: #f0f4f8; /* Optional: Light background */
 }
 
 th, td {
     padding-left: 1rem;
     padding-right: 1rem;
 }
+
+.login-logo {
+    width: 15.625rem; 
+    height: auto;
+    margin-bottom: 1.25rem;
+  }
+
+.login-container {
+    text-align: center;
+    padding: 1.25rem;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9375rem;
+}
+
+.login-form input {
+    padding: 0.625rem;
+    min-width: 15.625rem;
+}
+
+.login-form button {
+    background-color: #61affe;
+}
+
+input {
+    transition: border-color 0.2s ease-in-out;
+    border-radius: 0.25rem;
+    border-width: 0.0625rem;
+}
+input:focus {
+    border: 0.0625rem solid #6495ED;
+    outline: none;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+	width: 2.5rem; /* Width in rem */
+	height: 2.5rem; /* Height in rem */
+	border: 0.3125rem solid #f3f3f3; /* Light gray background color */
+	border-top: 0.3125rem solid blue; /* Blue spinner color */
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 9999;
+	backdrop-filter: blur(0.3125rem); /* Apply blur to background */
+}
+
+/* Spinner Animation */
+@keyframes spin {
+	0% { transform: translate(-50%, -50%) rotate(0deg); }
+	100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.error-container {
+    min-height: 1.5rem;
+}
+
+.error-message {
+    color: red;
+    display: inline-block;
+}
+
