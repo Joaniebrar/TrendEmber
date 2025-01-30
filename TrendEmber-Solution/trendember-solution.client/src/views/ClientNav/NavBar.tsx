@@ -1,5 +1,10 @@
 import {FC, useState, useRef, useEffect} from 'react';
 import {Link} from 'react-router-dom';
+import { FaChartLine,FaChartSimple } from 'react-icons/fa6';
+import { FaHome,FaCloudDownloadAlt } from "react-icons/fa"; 
+import { GiElectricalResistance } from "react-icons/gi";
+import { PiStrategy } from "react-icons/pi";
+import { GiArtificialIntelligence } from "react-icons/gi";
 import './NavBar.css'
 
 const NavBar: FC = () => {
@@ -44,6 +49,15 @@ const NavBar: FC = () => {
                     <div></div>
                     <div></div>
                 </button>                
+                <ul className={`menu-nav-list ${isMenuOpen ? 'open' : ''}`}>
+                    <li className='menu-nav-list-item'><Link to="/"><FaHome />Home</Link></li>
+                    <li className='menu-nav-list-item'><Link to="/Lens"><FaChartSimple />Lens</Link></li>
+                    <li className='menu-nav-list-item'><Link to="/Harvester"><FaCloudDownloadAlt />Harvester</Link></li>
+                    <li className='menu-nav-list-item'><Link to="/Threshold"><GiElectricalResistance />Threshold</Link></li>
+                    <li className='menu-nav-list-item'><Link to="/Visualizer"><FaChartLine />Visualizer</Link></li>
+                    <li className='menu-nav-list-item'><Link to="/Stratum"><PiStrategy />Stratum</Link></li>
+                    <li className='menu-nav-list-item'><Link to="/PatternIQ"><GiArtificialIntelligence />PatternIQ</Link></li> 
+                </ul>
             </nav>            
         </header>
         );
