@@ -24,28 +24,29 @@ const NavBar: FC = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [isMenuOpen]);
-    return (
+    return (        
         <header className="header">
-             <h1>TrendEmber</h1>
-    <nav className='menu-nav' ref={menuRef}>
-                    <button className="hamburger" onClick={toggleMenu}>
-                <div className="hamburger-icon">
+            <div className="header-content">
+                <span className="glasses-icon">
+                    <svg width="30" height="25" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="8" y="18" width="20" height="12" rx="4" stroke="white" stroke-width="2" fill="none"/>
+                        <rect x="36" y="18" width="20" height="12" rx="4" stroke="white" stroke-width="2" fill="none"/>
+                        <line x1="28" y1="24" x2="36" y2="24" stroke="white" stroke-width="2"/> 
+                        <polyline points="12,26 16,22 20,25 24,20" stroke="blue" stroke-width="2" fill="none"/>
+                        <polyline points="40,22 44,26 48,21 52,24" stroke="green" stroke-width="2" fill="none"/>        
+                    </svg>
+                </span>
+                <h1>TrendEmber</h1>
+            </div>
+            <nav className='menu-nav' ref={menuRef}>
+                <button className="hamburger" onClick={toggleMenu}>
+                <div></div>
                     <div></div>
                     <div></div>
-                    <div></div>
-                </div>
-            </button>
-        <ul className={`menu-nav-list ${isMenuOpen ? 'open' : ''}`}>
-            <li className='menu-nav-list-item'><Link to="/">Home</Link></li>
-            <li className='menu-nav-list-item'><Link to="/Lens">Lens</Link></li>
-            <li className='menu-nav-list-item'><Link to="/Harvester">Harvester</Link></li>
-            <li className='menu-nav-list-item'><Link to="/Threshold">Threshold</Link></li>
-            <li className='menu-nav-list-item'><Link to="/Visualizer">Visualizer</Link></li>
-            <li className='menu-nav-list-item'><Link to="/Stratum">Stratum</Link></li>
-            <li className='menu-nav-list-item'><Link to="/PatternIQ">PatternIQ</Link></li>            
-        </ul>
-    </nav>
-    </header>);
+                </button>                
+            </nav>            
+        </header>
+        );
 }
 
 export default NavBar;

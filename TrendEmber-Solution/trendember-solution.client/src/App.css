@@ -1,14 +1,13 @@
 ﻿#root {
     width: 100%;
-    min-height: 100vh; /* Full viewport height */
+    /*min-height: 100vh; */
     margin: 0;
     padding: 2rem;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Center content vertically */
-    align-items: center; /* Center content horizontally */
+    justify-content: center; 
+    align-items: center; 
     text-align: center;
-    background-color: #f0f4f8; /* Optional: Light background */
 }
 
 th, td {
@@ -39,7 +38,9 @@ th, td {
 }
 
 .login-form button {
-    background-color: #61affe;
+    background-color: #7a7777;
+    font-family: 'Nunito', sans-serif;
+    color: white
 }
 
 input {
