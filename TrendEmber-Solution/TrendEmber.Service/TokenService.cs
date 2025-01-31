@@ -1,4 +1,4 @@
-﻿using TrendEmber.Core.Authentication;
+using TrendEmber.Core.Authentication;
 using Microsoft.Extensions.Options;
 using TrendEmber.Core.Identity;
 using System.Security.Claims;
