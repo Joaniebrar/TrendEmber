@@ -2,9 +2,9 @@ import {FC, useState, useRef, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import { FaChartLine,FaChartSimple } from 'react-icons/fa6';
 import { FaHome,FaCloudDownloadAlt } from "react-icons/fa"; 
-import { GiElectricalResistance } from "react-icons/gi";
+import { GiElectricalResistance, GiArtificialIntelligence } from "react-icons/gi";
+import { IoMdLogOut } from "react-icons/io";
 import { PiStrategy } from "react-icons/pi";
-import { GiArtificialIntelligence } from "react-icons/gi";
 import './NavBar.css'
 
 const NavBar: FC = () => {
@@ -57,6 +57,7 @@ const NavBar: FC = () => {
                     <li className='menu-nav-list-item'><Link to="/Visualizer"><FaChartLine />Visualizer</Link></li>
                     <li className='menu-nav-list-item'><Link to="/Stratum"><PiStrategy />Stratum</Link></li>
                     <li className='menu-nav-list-item'><Link to="/PatternIQ"><GiArtificialIntelligence />PatternIQ</Link></li> 
+                    <li className='menu-nav-list-item'><Link to="/Logout"><IoMdLogOut />Logout</Link></li> 
                 </ul>
             </nav>            
         </header>

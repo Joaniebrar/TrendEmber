@@ -1,4 +1,4 @@
-﻿using TrendEmber.Core.Authentication;
+using TrendEmber.Core.Authentication;
 using Microsoft.Extensions.Options;
 using TrendEmber.Core.Identity;
 using System.Security.Claims;
@@ -14,9 +14,9 @@ namespace TrendEmber.Service
         private readonly JwtSettings _jwtSettings;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public TokenService(IOptions<JwtSettings> jwtSettings, UserManager<ApplicationUser> userManager)
+        public TokenService(JwtSettings jwtSettings, UserManager<ApplicationUser> userManager)
         { 
-            _jwtSettings = jwtSettings.Value;
+            _jwtSettings = jwtSettings;
             _userManager = userManager;
         }
 
