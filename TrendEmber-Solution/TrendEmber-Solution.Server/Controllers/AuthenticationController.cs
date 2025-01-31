@@ -27,7 +27,7 @@ namespace TrendEmber_Solution.Server.Controllers
             {
                 return Unauthorized();
             }
-            var token = _tokenService.GenerateJwtToken(user);
+            var token = await _tokenService.GenerateJwtToken(user);
 
             return Ok(new { Token = token });
         }

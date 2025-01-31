@@ -1,4 +1,24 @@
-﻿#root {
+﻿@font-face {
+    font-family: 'Nunito';
+    src: url('./assets/fonts/Nunito-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Nunito';
+    src: url('./assets/fonts/Nunito.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Nunito';
+    src: url('./assets/fonts/Nunito-Light.ttf') format('truetype');
+    font-weight: lighter;
+    font-style: normal;
+  }
+
+#root {
     width: 100%;
     /*min-height: 100vh; */
     margin: 0;

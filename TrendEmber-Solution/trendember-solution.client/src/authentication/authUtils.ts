@@ -1,4 +1,4 @@
-import { Token,User } from './types';
+import { User } from './types';
 import axios from 'axios';
 
 const API_BASE_URL = '/api'; 
@@ -12,7 +12,7 @@ export const getUser = async (): Promise<User | null> => {
 };
 
 // Simulates logging in
-export const loginUser = async (email: string, password: string): Promise<Token> => {
+export const loginUser = async (email: string, password: string): Promise<string> => {
     const response = await axios.post(`${API_BASE_URL}/Authentication/login`, {
         email,
         password,
@@ -22,5 +22,13 @@ export const loginUser = async (email: string, password: string): Promise<Token>
 
 // Simulates logging out
 export const logoutUser = async (): Promise<void> => {
-    await axios.post(`${API_BASE_URL}Authentication/login`, {}, { withCredentials: true });
+    await axios.post(
+        `${API_BASE_URL}/Authentication/logout`,
+        {}, // Empty body for logout request (if needed)
+        {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            }
+        }
+    );
 };
