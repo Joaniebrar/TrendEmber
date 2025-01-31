@@ -2,3 +2,15 @@
 **/bin/
 **/obj/
 **/node_modules/
+TrendEmber-Solution/.vs/
+TrendEmber-Solution/TrendEmber.Service/obj/
+TrendEmber-Solution/obj/
+TrendEmber-Solution/TrendEmber-Solution.Server/bin/
+TrendEmber-Solution/TrendEmber-Solution.Server/obj/
+TrendEmber-Solution/TrendEmber.Core/bin/
+TrendEmber-Solution/TrendEmber.Core/obj/
+TrendEmber-Solution/TrendEmber.Data/bin/
+TrendEmber-Solution/TrendEmber.Data/obj/
+TrendEmber-Solution/TrendEmber.Service/bin/
+TrendEmber-Solution/TrendEmber.Service/obj/
+TrendEmber-Solution/trendember-solution.client/obj/
