@@ -30,8 +30,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const login = async (email: string, password: string): Promise<boolean> => {
         try {
             const token = await loginUser(email,password);            
-            if (token && token.status == 5) {
-                localStorage.setItem('authToken',token.result);
+            if (token) {
+                localStorage.setItem('authToken',token);
                 setIsAuthenticated(true);
                 setUser({email} as User);
                 setError(null);
@@ -48,8 +48,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const logout = async ()=> {
-        localStorage.removeItem('authToken'); 
         await logoutUser();
+        localStorage.removeItem('authToken'); 
         setError(null);
         setUser(null);
         setIsAuthenticated(false);

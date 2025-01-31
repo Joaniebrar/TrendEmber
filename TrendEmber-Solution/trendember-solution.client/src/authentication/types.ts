@@ -4,19 +4,7 @@ export interface User {
     email: string;
     roles: string[];    
   }
-  
-export interface Token {
-    result: string;
-    id: number;
-    exception: string | null;
-    status: number;
-    isCanceled: boolean;
-    isCompleted: boolean;
-    isCompletedSuccessfully: boolean;
-    creationOptions: number;
-    asyncState: any | null;
-    isFaulted: boolean;
-}
+
 
 
   // Type for the authentication context
