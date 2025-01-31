@@ -3,7 +3,7 @@
 "ServerUrl": "https://localhost:5173",
 "RedirectUrl": "",
 "LaunchCommand": "npm run dev",
-"WorkingDirectory": "C:\\Users\\juttb\\source\\repos\\TrendEmber-Solution\\TrendEmber-Solution.Server\\..\\trendember-solution.client",
+"WorkingDirectory": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber-Solution.Server\\..\\trendember-solution.client",
 "MaxTimeoutInSeconds": "120",
 "KeepRunning": "false"
 }

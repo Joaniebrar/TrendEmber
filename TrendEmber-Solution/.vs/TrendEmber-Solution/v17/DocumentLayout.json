@@ -1,12 +1,207 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\juttb\\source\\repos\\TrendEmber-Solution\\",
-  "Documents": [],
+  "WorkspaceRootPath": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{ABA28CE0-A4CA-41E4-BE68-A2D8E3AFA75E}|TrendEmber-Solution.Server\\TrendEmber-Solution.Server.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember-solution.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ABA28CE0-A4CA-41E4-BE68-A2D8E3AFA75E}|TrendEmber-Solution.Server\\TrendEmber-Solution.Server.csproj|solutionrelative:trendember-solution.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF12494B-F78C-49C8-9419-A8643A1EE0F9}|TrendEmber.Service\\TrendEmber.Service.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember.service\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF12494B-F78C-49C8-9419-A8643A1EE0F9}|TrendEmber.Service\\TrendEmber.Service.csproj|solutionrelative:trendember.service\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{206F1399-44AE-4EB6-BE86-C7529365B65C}|TrendEmber.Core\\TrendEmber.Core.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember.core\\identity\\roles.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{206F1399-44AE-4EB6-BE86-C7529365B65C}|TrendEmber.Core\\TrendEmber.Core.csproj|solutionrelative:trendember.core\\identity\\roles.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ABA28CE0-A4CA-41E4-BE68-A2D8E3AFA75E}|TrendEmber-Solution.Server\\TrendEmber-Solution.Server.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember-solution.server\\policy\\policy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ABA28CE0-A4CA-41E4-BE68-A2D8E3AFA75E}|TrendEmber-Solution.Server\\TrendEmber-Solution.Server.csproj|solutionrelative:trendember-solution.server\\policy\\policy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{206F1399-44AE-4EB6-BE86-C7529365B65C}|TrendEmber.Core\\TrendEmber.Core.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember.core\\identity\\registermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{206F1399-44AE-4EB6-BE86-C7529365B65C}|TrendEmber.Core\\TrendEmber.Core.csproj|solutionrelative:trendember.core\\identity\\registermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{206F1399-44AE-4EB6-BE86-C7529365B65C}|TrendEmber.Core\\TrendEmber.Core.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember.core\\identity\\loginmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{206F1399-44AE-4EB6-BE86-C7529365B65C}|TrendEmber.Core\\TrendEmber.Core.csproj|solutionrelative:trendember.core\\identity\\loginmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{206F1399-44AE-4EB6-BE86-C7529365B65C}|TrendEmber.Core\\TrendEmber.Core.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember.core\\identity\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{206F1399-44AE-4EB6-BE86-C7529365B65C}|TrendEmber.Core\\TrendEmber.Core.csproj|solutionrelative:trendember.core\\identity\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF12494B-F78C-49C8-9419-A8643A1EE0F9}|TrendEmber.Service\\TrendEmber.Service.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember.service\\itokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF12494B-F78C-49C8-9419-A8643A1EE0F9}|TrendEmber.Service\\TrendEmber.Service.csproj|solutionrelative:trendember.service\\itokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{206F1399-44AE-4EB6-BE86-C7529365B65C}|TrendEmber.Core\\TrendEmber.Core.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember.core\\configuration\\jwtsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{206F1399-44AE-4EB6-BE86-C7529365B65C}|TrendEmber.Core\\TrendEmber.Core.csproj|solutionrelative:trendember.core\\configuration\\jwtsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ABA28CE0-A4CA-41E4-BE68-A2D8E3AFA75E}|TrendEmber-Solution.Server\\TrendEmber-Solution.Server.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember-solution.server\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{ABA28CE0-A4CA-41E4-BE68-A2D8E3AFA75E}|TrendEmber-Solution.Server\\TrendEmber-Solution.Server.csproj|solutionrelative:trendember-solution.server\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF07263E-624F-4887-88C3-0249CDAAE3A5}|TrendEmber.Data\\TrendEmber.Data.csproj|c:\\users\\juttb\\source\\repos\\joaniebrar\\trendember\\trendember-solution\\trendember.data\\identitycontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF07263E-624F-4887-88C3-0249CDAAE3A5}|TrendEmber.Data\\TrendEmber.Data.csproj|solutionrelative:trendember.data\\identitycontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Policy.cs",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber-Solution.Server\\Policy\\Policy.cs",
+              "RelativeDocumentMoniker": "TrendEmber-Solution.Server\\Policy\\Policy.cs",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber-Solution.Server\\Policy\\Policy.cs",
+              "RelativeToolTip": "TrendEmber-Solution.Server\\Policy\\Policy.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T18:51:39.946Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Roles.cs",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Core\\Identity\\Roles.cs",
+              "RelativeDocumentMoniker": "TrendEmber.Core\\Identity\\Roles.cs",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Core\\Identity\\Roles.cs",
+              "RelativeToolTip": "TrendEmber.Core\\Identity\\Roles.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T18:49:28.528Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ITokenService.cs",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Service\\ITokenService.cs",
+              "RelativeDocumentMoniker": "TrendEmber.Service\\ITokenService.cs",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Service\\ITokenService.cs",
+              "RelativeToolTip": "TrendEmber.Service\\ITokenService.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T17:49:58.479Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "JwtSettings.cs",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Core\\Configuration\\JwtSettings.cs",
+              "RelativeDocumentMoniker": "TrendEmber.Core\\Configuration\\JwtSettings.cs",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Core\\Configuration\\JwtSettings.cs",
+              "RelativeToolTip": "TrendEmber.Core\\Configuration\\JwtSettings.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T17:48:39.566Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber-Solution.Server\\Program.cs",
+              "RelativeDocumentMoniker": "TrendEmber-Solution.Server\\Program.cs",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber-Solution.Server\\Program.cs",
+              "RelativeToolTip": "TrendEmber-Solution.Server\\Program.cs",
+              "ViewState": "AQIAACQAAAAAAAAAAAAUwFMAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T17:16:32.531Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "LoginModel.cs",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Core\\Identity\\LoginModel.cs",
+              "RelativeDocumentMoniker": "TrendEmber.Core\\Identity\\LoginModel.cs",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Core\\Identity\\LoginModel.cs",
+              "RelativeToolTip": "TrendEmber.Core\\Identity\\LoginModel.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T06:35:41.644Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "RegisterModel.cs",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Core\\Identity\\RegisterModel.cs",
+              "RelativeDocumentMoniker": "TrendEmber.Core\\Identity\\RegisterModel.cs",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Core\\Identity\\RegisterModel.cs",
+              "RelativeToolTip": "TrendEmber.Core\\Identity\\RegisterModel.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T06:35:23.473Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TokenService.cs",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Service\\TokenService.cs",
+              "RelativeDocumentMoniker": "TrendEmber.Service\\TokenService.cs",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Service\\TokenService.cs",
+              "RelativeToolTip": "TrendEmber.Service\\TokenService.cs",
+              "ViewState": "AQIAABkAAAAAAAAAAAAgwDMAAAAxAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T06:32:56.364Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ApplicationUser.cs",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Core\\Identity\\ApplicationUser.cs",
+              "RelativeDocumentMoniker": "TrendEmber.Core\\Identity\\ApplicationUser.cs",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Core\\Identity\\ApplicationUser.cs",
+              "RelativeToolTip": "TrendEmber.Core\\Identity\\ApplicationUser.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T06:12:22.857Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber-Solution.Server\\appsettings.json",
+              "RelativeDocumentMoniker": "TrendEmber-Solution.Server\\appsettings.json",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber-Solution.Server\\appsettings.json",
+              "RelativeToolTip": "TrendEmber-Solution.Server\\appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-01-27T16:59:13.25Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "IdentityContext.cs",
+              "DocumentMoniker": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Data\\IdentityContext.cs",
+              "RelativeDocumentMoniker": "TrendEmber.Data\\IdentityContext.cs",
+              "ToolTip": "C:\\Users\\juttb\\source\\repos\\Joaniebrar\\TrendEmber\\TrendEmber-Solution\\TrendEmber.Data\\IdentityContext.cs",
+              "RelativeToolTip": "TrendEmber.Data\\IdentityContext.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAAKAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-27T06:12:51.665Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
