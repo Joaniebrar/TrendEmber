@@ -1,2 +1,0 @@
-C:\Users\juttb\source\repos\TrendEmber-Solution\trendember-solution.client\obj\Debug\trendember-solution.client.esproj.CoreCompileInputs.cache
-C:\Users\juttb\source\repos\Joaniebrar\TrendEmber\TrendEmber-Solution\trendember-solution.client\obj\Debug\trendember-solution.client.esproj.CoreCompileInputs.cache
