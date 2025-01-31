@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TrendEmber.Core.Authentication;
@@ -24,6 +24,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<IdentityContext>()
         .AddDefaultTokenProviders();
 
+
 //add jwt 
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettingsSection["SecretKey"] ?? throw new InvalidOperationException("JwtSettings:SecretKey is not configured.");
@@ -34,7 +35,11 @@ var audience = jwtSettingsSection["Audience"] ?? throw new InvalidOperationExcep
 var jwtSettings = new JwtSettings(secretKey, issuer, audience);
 builder.Services.AddSingleton(jwtSettings);
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
         .AddJwtBearer(options =>
         {
             options.RequireHttpsMetadata = false;
@@ -48,6 +53,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 ValidIssuer = issuer,
                 ValidAudience = audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+            };
+            options.Events = new JwtBearerEvents
+            {
+                OnChallenge = context =>
+                {
+                    context.HandleResponse(); // Prevents the default redirect behavior
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync("{\"error\":\"Unauthorized\"}");
+                },
+                OnForbidden = context =>
+                {
+                    // If a user is not authorized (e.g., no valid roles), return 403 instead of redirect
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync("{\"error\":\"Forbidden\"}");
+                }
             };
         });
 
@@ -73,6 +95,41 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
+    dbContext.Database.Migrate();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    //seed initial super user
+    Task.Run(async () => {
+        var initialUsers = builder.Configuration.GetSection("InitialUsers").GetChildren();
+
+        foreach (var initialUserConfig in initialUsers)
+        {
+            var username = initialUserConfig.GetValue<string>("Username") ?? throw new ArgumentNullException("Username cannot be null or empty.");
+            var email = initialUserConfig.GetValue<string>("Email") ?? throw new ArgumentNullException("Email cannot be null or empty.");
+            var fullName = initialUserConfig.GetValue<string>("FullName") ?? throw new ArgumentNullException("FullName cannot be null or empty.");
+            var password = initialUserConfig.GetValue<string>("Password") ?? throw new ArgumentNullException("Password cannot be null or empty.");
+
+            var rolesString = initialUserConfig.GetValue<string>("Roles") ?? throw new ArgumentNullException("Roles cannot be null or empty.");
+            var roles = rolesString.Split('|').Select(role => role.Trim()).ToArray();
+
+            var user = userManager.FindByEmailAsync(email).Result;
+            if (user == null)
+            {
+                var newUser = new ApplicationUser(fullName) { UserName = username, Email = email };
+                var result = userManager.CreateAsync(newUser, password).Result;
+
+                if (result.Succeeded)
+                {
+                    userManager.AddToRolesAsync(newUser, roles).Wait();
+                }
+            }
+        }
+    }).Wait();
+}
+
 app.UseAuthentication();
 
 app.UseAuthorization();
@@ -81,16 +138,5 @@ app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
 
-app.MapPost("/token", async (LoginRequest loginRequest, TokenService tokenService, UserManager<ApplicationUser> userManager) =>
-{
-    var user = await userManager.FindByNameAsync(loginRequest.Email);
-    if (user == null || !await userManager.CheckPasswordAsync(user, loginRequest.Password))
-    {
-        return Results.Unauthorized();
-    }
-    var token = tokenService.GenerateJwtToken(user);
-
-    return Results.Ok(new { Token = token });
-});
 
 app.Run();
