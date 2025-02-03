@@ -8,7 +8,8 @@
     "baseUrl": "./src",
     "paths": {
       "@hooks/*": [ "hooks/*" ],
-      "@authentication/*": [ "authentication/*" ]
+      "@authentication/*": [ "authentication/*" ],
+      "@api/*": [ "api/endpoints/*" ]
     }
   }
 }

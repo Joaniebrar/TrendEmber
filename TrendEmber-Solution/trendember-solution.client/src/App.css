@@ -57,10 +57,17 @@ th, td {
     min-width: 15.625rem;
 }
 
-.login-form button {
+button {
     background-color: #7a7777;
     font-family: 'Nunito', sans-serif;
     color: white
+}
+.view-content button {
+    border: 0.025rem solid #7a7777; 
+    transition: border 0.2s ease;
+}
+.view-content button:hover {
+    border: 0.025rem solid black; 
 }
 
 input {
@@ -104,3 +111,57 @@ input:focus {
     display: inline-block;
 }
 
+#import-tradeset{
+    margin: 1rem 0.5rem;
+    display: inline-block;
+}
+
+.tradeset-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
+	gap: 1.25rem;
+	margin: 0.625rem;
+	padding: 0.625rem;
+	overflow-y: auto;
+}
+
+.trade-set {
+	background-color: #f8f8f8;
+	border: 1px solid #ddd;
+	border-radius: 0.3125rem;
+	padding: 0.9375rem;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
+}
+
+.tradeset-item {
+	margin-bottom: 0.625rem;
+	display: flex;
+	justify-content: space-between;
+}
+
+.tradeset-item-label {
+	font-weight: bold;
+	color: #333;
+}
+
+.tradeset-item-value {
+	color: #666;
+}
+
+.trade-set:hover {
+	background-color: #e0e0e0;
+	cursor: pointer;
+}
+
+.tradeset-container {
+	scrollbar-width: thin;
+	scrollbar-color: #888 #e0e0e0;
+}
+
+@media (max-width: 48rem) {
+	.tradeset-container {
+		grid-template-columns: 1fr;
+	}
+}

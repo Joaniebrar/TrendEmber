@@ -1,24 +1,24 @@
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import { useAuth } from '../../authentication/useAuth';
 import logo from "../../assets/logo.png"
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const {login, error, isAuthenticated} = useAuth();
+    const {login: authenticate, error} = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading,setIsLoading] = useState(false);
     const navigate = useNavigate();
-    
-    if (isAuthenticated) {
-        navigate('/'); 
-        return null;   
-    }
 
     const handleLoginClick = async () => {
         setIsLoading(true);
-        await login(email,password);
-        setIsLoading(false);
+        await authenticate(email,password)
+            .then((result: boolean) =>{
+                if (result){
+                    navigate('/');
+                }
+            })
+            .finally(()=>setIsLoading(false));        
     };
 
     const handleSubmit = (e: React.FormEvent) => {

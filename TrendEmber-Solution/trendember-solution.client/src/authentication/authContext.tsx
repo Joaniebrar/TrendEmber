@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode, useContext, useEffect } from "react";
+import { createContext, useState, ReactNode, useEffect } from "react";
 import { loginUser } from './authUtils';
 import { logoutUser } from './authUtils';
 import {User} from './types';
@@ -48,11 +48,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const logout = async ()=> {
-        await logoutUser();
-        localStorage.removeItem('authToken'); 
-        setError(null);
-        setUser(null);
-        setIsAuthenticated(false);
+      await logoutUser()
+        .finally(() => {
+          localStorage.removeItem('authToken'); 
+          setError(null);
+          setUser(null);
+          setIsAuthenticated(false);
+        });
     };
     
 
