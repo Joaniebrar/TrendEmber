@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TrendEmber.Core.Authentication;
@@ -20,6 +19,9 @@ builder.Services.AddSwaggerGen();
 // add identity context
 builder.Services.AddDbContext<IdentityContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("IdentityConnection")));
+builder.Services.AddDbContext<TrendsDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("TrendsConnection")));
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<IdentityContext>()
         .AddDefaultTokenProviders();
@@ -128,6 +130,9 @@ using (var scope = app.Services.CreateScope())
             }
         }
     }).Wait();
+
+    var trendsDbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+    trendsDbContext.Database.Migrate();
 }
 
 app.UseAuthentication();
