@@ -9,7 +9,7 @@ namespace TrendEmber_Solution.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthenticationController : Controller
+    public class AuthenticationController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
