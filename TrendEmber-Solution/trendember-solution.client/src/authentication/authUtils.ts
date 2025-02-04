@@ -1,33 +1,37 @@
 import { User } from './types';
-import axios from 'axios';
 
 const API_BASE_URL = '/api'; 
 
-// Simulates fetching the currently logged-in user
 export const getUser = async (): Promise<User | null> => {
-    const response = await axios.get(`${API_BASE_URL}/auth/user`, {
-        withCredentials: true,
+    const response = await fetch(`${API_BASE_URL}/auth/user`, {
+        method: "GET"
     });
-    return response.data;
+    return await response.json();
 };
 
-// Simulates logging in
 export const loginUser = async (email: string, password: string): Promise<string> => {
-    const response = await axios.post(`${API_BASE_URL}/Authentication/login`, {
-        email,
-        password,
+    const response = await fetch(`${API_BASE_URL}/Authentication/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            email,
+            password,
+        })
     });
-    return response.data?.token;
+    const data = await response.json();
+    return data.token;
 };
 
-// Simulates logging out
 export const logoutUser = async (): Promise<void> => {
-    await axios.post(
+    await fetch(
         `${API_BASE_URL}/Authentication/logout`,
-        {}, // Empty body for logout request (if needed)
         {
+            method: "POST",
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+                "Content-Type": "application/json",
             }
         }
     );

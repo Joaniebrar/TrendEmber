@@ -9,7 +9,7 @@
     "paths": {
       "@hooks/*": [ "hooks/*" ],
       "@authentication/*": [ "authentication/*" ],
-      "@api/*": [ "api/endpoints/*" ]
+      "@api/*": [ "api/*" ]
     }
   }
 }
