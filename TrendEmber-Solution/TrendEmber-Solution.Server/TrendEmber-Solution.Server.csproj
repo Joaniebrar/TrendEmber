@@ -27,6 +27,7 @@
     <ProjectReference Include="..\trendember-solution.client\trendember-solution.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\TrendEmber.Contract\TrendEmber.Contract.csproj" />
     <ProjectReference Include="..\TrendEmber.Data\TrendEmber.Data.csproj" />
     <ProjectReference Include="..\TrendEmber.Service\TrendEmber.Service.csproj" />
   </ItemGroup>

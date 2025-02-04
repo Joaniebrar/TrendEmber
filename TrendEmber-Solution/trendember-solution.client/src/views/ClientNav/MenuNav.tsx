@@ -2,7 +2,7 @@ import {FC, useState, useRef} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import { useAuth } from '@authentication/useAuth';
 import useMenuCloseOnClickOutside from '@hooks/useMenuCloseOnClickOutside';
-import { navigationItems } from "../../constants/appRoutes";
+import { navigationItems,loginView } from "../../constants/appRoutes";
 
 
 const MenuNav: FC = () => {
@@ -18,7 +18,7 @@ const MenuNav: FC = () => {
     const handleLogout = () => {
         logout(); 
         setIsMenuOpen(false);
-        navigate('/login'); 
+        navigate(loginView.path); 
     };
     return isAuthenticated && (
         <nav className='menu-nav' ref={menuRef}>
