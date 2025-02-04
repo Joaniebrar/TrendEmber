@@ -82,6 +82,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ITradeService, TradeService>();
 
 var app = builder.Build();
 

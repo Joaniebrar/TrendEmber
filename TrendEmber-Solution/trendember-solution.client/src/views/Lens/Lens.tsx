@@ -1,7 +1,13 @@
 import { FaChartSimple } from 'react-icons/fa6';
-import {useGetTradeSets} from '@api/trades/hooks';
+import {useGetTradeSets} from '@api/endpoints/trades/hooks';
+import TradeSetItem  from './TradeSetItem';
 
 const Lens= () => {
+    const { data, error, isLoading } = useGetTradeSets();
+
+    if (isLoading) return <p>Loading...</p>;
+    if (error) return <p>Error fetching trade sets</p>;
+
     return (
     <div className="view-content" >
         <h1><FaChartSimple /> Lens</h1>
@@ -10,24 +16,18 @@ const Lens= () => {
         </div>
         <div id='tradesets-view'>
             <h2>Trade Sets</h2>
-            <div className="tradeset-container">
-                <div className='trade-set'>
-                    <div className="tradeset-item">
-                        <span className="tradeset-item-label">Name:</span>
-                        <span className="tradeset-item-value">Trade Set 1</span>
+            <div className="tradeset-container">                            
+                {data && 
+                    <div className='trade-set'>
+                    {data.data.map((item) => (<TradeSetItem key ={item.id} tradeSet= {item}/>))}
                     </div>
-                    <div className="tradeset-item">
-                        <span className="tradeset-item-label">Imported Date:</span>
-                        <span className="tradeset-item-value">2025-02-01</span>
-                    </div>
-                    <div className="tradeset-item">
-                        <span className="tradeset-item-label">Trades (Count):</span>
-                        <span className="tradeset-item-value">15</span>
-                    </div>
-                </div>
+                } 
             </div>
         </div>
+        <div>
+    </div>
     </div>);
 }
 
 export default Lens;
+      

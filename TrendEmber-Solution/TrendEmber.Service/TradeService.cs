@@ -1,15 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TrendEmber.Core.Trends;
 using TrendEmber.Data;
 
 namespace TrendEmber.Service
 {
-    public class TradeService
+    public class TradeService : ITradeService
     {
         private TrendsDbContext _dbContext;
         public TradeService(TrendsDbContext trendsDbContext) { 
