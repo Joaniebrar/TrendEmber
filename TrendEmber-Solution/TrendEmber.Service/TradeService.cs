@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrendEmber.Core.Trends;
 using TrendEmber.Data;
 
@@ -16,7 +17,7 @@ namespace TrendEmber.Service
 
             if (!string.IsNullOrEmpty(cursor) && DateTime.TryParse(cursor, out var lastDate))
             {
-                query = query.Where(ts => ts.ImportedDate < lastDate);
+                query = query.Where(ts => ts.ImportedDate < lastDate.ToUniversalTime());
             }
 
             var tradeSets =  await query.Take(pageSize).ToListAsync();

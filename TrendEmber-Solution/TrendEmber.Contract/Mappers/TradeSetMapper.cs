@@ -7,7 +7,7 @@ namespace TrendEmber.Contract.Mappers
         public static TradeSetDto Map(TradeSet tradeSet) => new TradeSetDto{
             Id = tradeSet.Id,
             Name = tradeSet.Name,
-            ImportedDate = tradeSet.ImportedDate,
+            ImportedDate = tradeSet.ImportedDate.ToUniversalTime().ToString("o"),
             TradeCount = tradeSet.Trades.Count()
         };
     }

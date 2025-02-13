@@ -4,6 +4,17 @@ import {FC} from 'react';
 interface TradeSetItemProps {
     tradeSet: TradeSet
 }
+function convertToLocalDate(isoDateString: string) {
+    if (!isoDateString) return null;
+
+    const date = new Date(isoDateString);
+    return date.toLocaleDateString("en-US", {  
+        year: "numeric",  
+        month: "long", 
+        day: "numeric"  
+    });
+}
+
 const TradeSetItem: FC<TradeSetItemProps>  = ({tradeSet}) => {
     return (
     <div className='trade-set'>
@@ -13,7 +24,7 @@ const TradeSetItem: FC<TradeSetItemProps>  = ({tradeSet}) => {
         </div>
         <div className="tradeset-item">
             <span className="tradeset-item-label">Imported Date:</span>
-            <span className="tradeset-item-value">{tradeSet.importedDate}</span>
+            <span className="tradeset-item-value">{convertToLocalDate(tradeSet.importedDate)}</span>
         </div>
         <div className="tradeset-item">
             <span className="tradeset-item-label">Trades (Count):</span>

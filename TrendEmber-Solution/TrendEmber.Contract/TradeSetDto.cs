@@ -9,7 +9,7 @@ namespace TrendEmber.Contract
         [StringLength(100, MinimumLength = 1)]
         public string Name { get; set; } = string.Empty;
         [Required]
-        public DateTime ImportedDate { get; set; }
+        public string ImportedDate { get; set; } = string.Empty;
         [Range(0, int.MaxValue)]
         public int TradeCount { get; set; }
     }
