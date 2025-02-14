@@ -4,6 +4,7 @@ import {useGetTradeSets} from '@api/endpoints/trades/hooks';
 import TradeSetItem  from './TradeSetItem';
 import ImportWizard from './ImportWizard/ImportWizard';
 import { ImportType } from './ImportDetails';
+import { WizardProvider } from './ImportWizard/WizardContext';
 
 const Lens= () => {
     const { data, error, isLoading, fetchNextPage, hasNextPage, isFetchNextPageError } = useGetTradeSets();
@@ -18,12 +19,11 @@ const Lens= () => {
     };
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
-
-        // Cleanup on unmount
+        
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, [hasNextPage, isLoading, fetchNextPage]); // Ensure dependencies are correct 
+    }, [hasNextPage, isLoading, fetchNextPage]); 
     
 
         if (isLoading) return <p>Loading...</p>;
@@ -34,11 +34,16 @@ const Lens= () => {
             <h1><FaChartSimple /> Lens</h1>
             {showImportWizard &&
                 (<div className="modal-backdrop">
-                    <ImportWizard importType = {importType} setShowImportWizard={setShowImportWizard}/>
+                    <WizardProvider importType={importType} setShowImportWizard={setShowImportWizard}>
+                        <ImportWizard />
+                    </WizardProvider>
                     </div>
                 )}         
             <div id="import-tradeset">
-                <button id="import-tradeset" onClick={() => {setImportType(ImportType.TradeList);setShowImportWizard(true);}}>+ Import</button>
+                <button id="import-tradeset-btn" className="import-btn" onClick={() => {setImportType(ImportType.TradeList);setShowImportWizard(true);}}>+ Import</button>
+            </div>
+            <div id="import-watchlist">
+                <button id="import-watchlist-btn" className="import-btn" onClick={() => {setImportType(ImportType.WatchList);setShowImportWizard(true);}}>+ Import</button>
             </div>
             <div id="tradesets-view">
                 <h2>Trade Sets</h2>

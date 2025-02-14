@@ -15,9 +15,18 @@ interface WizardContextType {
     cancel: () => void;
     error: string | null;
     isLoading: boolean
+    step: number,
+    selectedFile: File | null,
+    fileContent: string,
+    setStepFunc: (stepNumber: number) => void;
+    setNameFunc: (name: string) => void;
+    setFileNameFunc: (fileName: string) => void;
+    setSelectionCriteriaFunc: (selectionCriteria: string[]) => void;
+    setSelectedFileFunc: (file: File) => void;
+    setFileContentFunc: (fileContent: string) => void;
 }
 
-const WizardContext = createContext<WizardContextType | undefined>(undefined);
+export const WizardContext = createContext<WizardContextType | undefined>(undefined);
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const WizardProvider: FC<WizardProviderProps> = ({ importType, setShowImportWizard, children }) => {
@@ -26,7 +35,9 @@ export const WizardProvider: FC<WizardProviderProps> = ({ importType, setShowImp
     const [selectionCriteria, setSelectionCriteria] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [fileContent, setFileContent] = useState<string>("");
+    const [step, setStep] = useState(0);
     const importFunction = async (details: ImportDetails) => {
         setIsLoading(true);
         try {
@@ -49,7 +60,17 @@ export const WizardProvider: FC<WizardProviderProps> = ({ importType, setShowImp
     };
 
     return (
-        <WizardContext.Provider value={{ name, fileName, selectionCriteria, importType, import:importFunction, cancel, error, isLoading }}>
+        <WizardContext.Provider value={{ 
+            name, fileName, selectionCriteria, importType, import:importFunction, 
+            cancel, error, isLoading, step, setStepFunc: setStep,
+            setNameFunc: setName,
+            setFileNameFunc: setFileName,
+            setSelectionCriteriaFunc : setSelectionCriteria,
+            selectedFile,
+            setSelectedFileFunc: setSelectedFile,
+            fileContent,
+            setFileContentFunc: setFileContent
+            }}>
             {children}
         </WizardContext.Provider>
     );

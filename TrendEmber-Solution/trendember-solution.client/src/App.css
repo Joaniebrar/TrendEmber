@@ -116,6 +116,11 @@ input:focus {
     display: inline-block;
 }
 
+.import-btn{
+    margin: 1rem 0.5rem;
+    display: inline-block;
+}
+
 .tradeset-container {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));

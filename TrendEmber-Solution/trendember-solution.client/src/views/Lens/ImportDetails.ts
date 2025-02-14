@@ -1,6 +1,6 @@
 export enum ImportType {
     TradeList = "tradeList",
-    WishList = "wishList"
+    WatchList = "watchList"
 }
 
 interface ImportDetails {
