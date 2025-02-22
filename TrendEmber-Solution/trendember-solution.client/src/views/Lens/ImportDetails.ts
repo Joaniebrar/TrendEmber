@@ -4,8 +4,6 @@ export enum ImportType {
 }
 
 interface ImportDetails {
-    type: ImportType,
-    fileName: string,
     mapping: Record<string,string>;
 }
 
