@@ -247,22 +247,51 @@ input:focus {
     min-width: 6.25rem;
   }
   
-  .lens-definition {
-    max-width: 55%;
+  /*.lens-definition {
     margin: 0 auto;
+    max-width: 90%;
     display: flex;
+    justify-content: center;
     flex-direction: column;
     align-items: flex-start;
   }
   
+  
   .lens-definition .form-group {
     display: flex;
     align-items: center;
-    gap: 0.5rem; /* Adds spacing between label and input */
-    width: 100%;
+    gap: 0.5rem; 
   }
   
   .lens-definition label {
-    white-space: nowrap; /* Ensures the label stays on one line */
+    white-space: nowrap; 
+    margin-right: 0;
   }
-  
+  .lens-definition input {
+    min-width: 0;
+    max-width: 15.625rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .lens-definition input[type="checkbox"]{
+    max-width: 1rem;    
+  }*/
+
+  button:disabled {
+    background-color: #d1d1d1;
+    color: #a1a1a1; 
+    cursor: not-allowed; 
+    opacity: 0.6; 
+  }
+
+  .lens-definition input {
+    min-width: 0;
+    max-width: 15.625rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .lens-definition input[type="checkbox"]{
+    max-width: 1rem;    
+  }

@@ -12,7 +12,7 @@ export const QUERY_STALE_TIMES = {
 
   type RequestOptions = {
     method?: RequestMethod;
-    body?: Record<string, any>;
+    body?: Record<string, any> | FormData;
     params?: Record<string, string | number>;
     auth?: boolean;
   }
@@ -24,7 +24,7 @@ export const QUERY_STALE_TIMES = {
   ) : Promise<T> => {
     let url = `${API_BASE_URL}/${endpoint}`;
     
-    //return JSON.stringify(url);
+    console.log(JSON.stringify(body));
     if (params){
       const searchParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) =>
@@ -32,7 +32,7 @@ export const QUERY_STALE_TIMES = {
       );
       url += `?${searchParams.toString()}`;
     }
-    const headers:HeadersInit = { "Content-Type": "application/json"};
+    const headers:HeadersInit = { };
     if (auth) {
       const token = localStorage.getItem("authToken");
       if (token) headers.Authorization = `Bearer ${token}`;
@@ -43,7 +43,12 @@ export const QUERY_STALE_TIMES = {
     };
   
     if (body) {
-      requestOptions.body = JSON.stringify(body);
+      if (body instanceof FormData) {
+        requestOptions.body = body; // Let the browser set Content-Type
+      } else {
+        headers["Content-Type"] = "application/json"; // Set JSON header
+        requestOptions.body = JSON.stringify(body);   // Convert body to JSON
+      }
     }
 
     const response = await fetch (url.toString(),requestOptions);
@@ -68,6 +73,7 @@ export const QUERY_STALE_TIMES = {
     body: Record<string, any>,
     auth: boolean = true
   ): Promise<T> => {
+    console.log(JSON.stringify(body));
     return apiRequest(endpoint, { method: "POST", body, auth });
   };
   

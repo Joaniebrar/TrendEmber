@@ -40,7 +40,7 @@ const Lens= () => {
                     </div>
                 )}         
             <div id="import-tradeset">
-                <button id="import-tradeset-btn" className="import-btn" onClick={() => {setImportType(ImportType.TradeList);setShowImportWizard(true);}}>+ Import</button>
+                <button id="import-tradeset-btn" className="import-btn" onClick={() => {setImportType(ImportType.TradeList);setShowImportWizard(true);}}>+ Trade Set</button>
             </div>
             <div id="import-watchlist">
                 <button id="import-watchlist-btn" className="import-btn" onClick={() => {setImportType(ImportType.WatchList);setShowImportWizard(true);}}>+ Import</button>

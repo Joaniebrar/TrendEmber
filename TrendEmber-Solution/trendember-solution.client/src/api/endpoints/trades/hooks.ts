@@ -1,6 +1,6 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { getTradeSets } from "./api";
-import { QUERY_STALE_TIMES,CursorPagedResponse, PageParams } from "@api/queryConfig"; 
+import { useInfiniteQuery, useMutation,useQueryClient  } from "@tanstack/react-query";
+import { getTradeSets, importTradeSets, ImportTradeSetsParams } from "./api";
+import { QUERY_STALE_TIMES,CursorPagedResponse } from "@api/queryConfig"; 
 import { TradeSet} from './models'
 
 export const useGetTradeSets = () => {
@@ -14,5 +14,19 @@ export const useGetTradeSets = () => {
     },
     getNextPageParam: (lastPage) => lastPage?.nextCursor || null,
     staleTime: QUERY_STALE_TIMES.SHORT, 
+  });
+};
+
+export const useImportTradeSets = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<TradeSet, Error, ImportTradeSetsParams>({
+    mutationFn: importTradeSets,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tradeSets"] });
+    },
+    onError: (error) => {
+      console.error("Import failed:", error);
+    },
   });
 };
