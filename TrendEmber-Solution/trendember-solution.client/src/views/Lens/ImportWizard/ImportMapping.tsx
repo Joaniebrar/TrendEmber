@@ -5,7 +5,7 @@ import { ImportType } from '../ImportDetails';
 const ImportMapping = () => {
     const currentContext = useContext(WizardContext);
     const [csvRows, setCsvRows] = useState<string[][]>([]);
-  
+    const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
     useEffect(() => {
         if (currentContext?.selectedFile) {
@@ -15,13 +15,17 @@ const ImportMapping = () => {
           reader.onload = (e) => {
             if (e && e.target && typeof e.target.result === 'string') {
               const text = e.target.result;
-      
-              // Regular expression to correctly split CSV considering commas inside quotes
               const rows = text.split("\n").map((row) => 
-                row.match(/(".*?"|[^",\n]+)(?=\s*,|\s*$)/g) || [] // Matches values, taking quoted values into account
+                row.match(/(".*?"|[^",\n]+)(?=\s*,|\s*$)/g) || [] 
               );
       
-              setCsvRows(rows.slice(0, 5)); // Show only the first 5 rows
+              setCsvRows(rows.slice(0, 5)); 
+
+              // Initialize selectedValues based on column count
+              const numberOfColumns = rows[0]?.length ?? 0;
+              setSelectedValues((prev) =>
+                prev.length === numberOfColumns ? prev : Array(numberOfColumns).fill("")
+              );
             }
           };
       
@@ -29,14 +33,23 @@ const ImportMapping = () => {
         }
       }, [currentContext?.selectedFile]);
       
-      function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
-        const selectedValue = event.target.value;
-        const allSelects = document.querySelectorAll("select");
-    
-        allSelects.forEach((select) => {
-          if (select !== event.target && select.value === selectedValue) {
-            select.value = ""; 
+      function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>, index: number) {
+        const value = event.target.value;
+      
+        setSelectedValues((prev) => {
+          const updatedValues = [...prev];
+      
+          while (updatedValues.length <= index) {
+            updatedValues.push("");
           }
+      
+          updatedValues[index] = value;
+
+          const cleanedValues = updatedValues.map((v, i) => (i !== index && v === value ? "" : v));
+      
+          currentContext?.setMappingSelections(cleanedValues.join(", "));
+      
+          return cleanedValues; 
         });
       }
 
@@ -51,7 +64,7 @@ const ImportMapping = () => {
             <tr>
                 {csvRows[0]?.map((_, index) => (
                 <th key={index}>
-                    <select key={`mapping-${index}`} onChange={(e) => handleSelectChange(e)}>
+                    <select key={`mapping-${index}`} className="mapping-selection" value={selectedValues[index] || ""} onChange={(e) => handleSelectChange(e, index)}>
                     <option value="">Select an option</option>
                     {currentContext?.selectionCriteria?.map((option, i) => (
                         <option key={`mapping-${index}-${i}`} value={option}>

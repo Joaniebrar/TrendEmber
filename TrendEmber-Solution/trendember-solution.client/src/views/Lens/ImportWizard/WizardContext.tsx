@@ -1,5 +1,6 @@
-import {FC, createContext, useState, ReactNode } from 'react';
-import ImportDetails, { ImportType } from '../ImportDetails';
+import {FC, createContext, useState } from 'react';
+import { ImportType } from '../ImportDetails';
+import {useImportTradeSets} from '@api/endpoints/trades/hooks';
 
 interface WizardProviderProps {
     importType: ImportType | undefined;
@@ -8,46 +9,42 @@ interface WizardProviderProps {
 }
 interface WizardContextType {
     name?: string,
-    fileName?: string,
     selectionCriteria?: string[],
     importType: ImportType | undefined,
-    import: (details: ImportDetails) => Promise<void>;
+    import: () => Promise<void>;
     cancel: () => void;
     error: string | null;
     isLoading: boolean
     step: number,
     selectedFile: File | null,
-    fileContent: string,
     ignoreFirstRow: boolean,
-    setStepFunc: (stepNumber: number) => void;
-    setNameFunc: (name: string) => void;
-    setFileNameFunc: (fileName: string) => void;
-    setSelectionCriteriaFunc: (selectionCriteria: string[]) => void;
-    setSelectedFileFunc: (file: File) => void;
-    setFileContentFunc: (fileContent: string) => void;
-    setIgnoreFirstRowFunc: (ignore: boolean) => void;
+    setStepFunc: (stepNumber: number) => void,
+    setNameFunc: React.Dispatch<React.SetStateAction<string>>,
+    setSelectedFileFunc: React.Dispatch<React.SetStateAction<File | null>>,
+    setIgnoreFirstRowFunc: (ignore: boolean) => void,
+    mappingSelections: string | null,
+    setMappingSelections: React.Dispatch<React.SetStateAction<string>>,
 }
 
 export const WizardContext = createContext<WizardContextType | undefined>(undefined);
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const WizardProvider: FC<WizardProviderProps> = ({ importType, setShowImportWizard, children }) => {
     const [name, setName] = useState<string>('');
-    const [fileName, setFileName] = useState('');
-    const [selectionCriteria, setSelectionCriteria] = useState<string[]>(["Symbol","Entry Date","Exit Date","TG1","TG2","SL"]);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [fileContent, setFileContent] = useState<string>("");
+    const [mappingSelections, setMappingSelections] = useState<string>("");
     const [step, setStep] = useState(0);
     const [ignoreFirstRow, setIgnoreFirstRow] = useState<boolean>(false);
-    const importFunction = async (details: ImportDetails) => {
+    const { mutate } = useImportTradeSets();
+
+    const importFunction = async () => {
         setIsLoading(true);
         try {
-            console.log("Importing data:", details);
-            // Make API call here
-            await sleep(3000);
-            cancel();
+            if (!selectedFile) return alert("Please select a file.");
+            
+            mutate({ file: selectedFile, name, mapping: mappingSelections, ignoreFirstRow });
+
         } catch (err) {
             setError("Import failed");
         } finally {
@@ -57,29 +54,23 @@ export const WizardProvider: FC<WizardProviderProps> = ({ importType, setShowImp
 
     const cancel = () => {
         setName('');
-        setFileName('');
-        setSelectionCriteria([]);
         setError(null);
         setShowImportWizard(false);
         setSelectedFile(null);
     };
 
-    if (importType === ImportType.WatchList){
-        setSelectionCriteria(["Symbol"])
-    }
     return (
         <WizardContext.Provider value={{ 
-            name, fileName, selectionCriteria, importType, import:importFunction, 
+            name, 
+            selectionCriteria: importType === ImportType.WatchList ? ["Symbol"]: ["Symbol","Entry Date","Exit Date","Entry","TG1","TG2","SL"], 
+            importType, import:importFunction, 
             cancel, error, isLoading, step, setStepFunc: setStep,
             setNameFunc: setName,
-            setFileNameFunc: setFileName,
-            setSelectionCriteriaFunc : setSelectionCriteria,
             selectedFile,
             setSelectedFileFunc: setSelectedFile,
-            fileContent,
             ignoreFirstRow,
-            setFileContentFunc: setFileContent,
-            setIgnoreFirstRowFunc: setIgnoreFirstRow
+            setIgnoreFirstRowFunc: setIgnoreFirstRow,
+            mappingSelections, setMappingSelections
             }}>
             {children}
         </WizardContext.Provider>
