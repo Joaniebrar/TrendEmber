@@ -82,16 +82,22 @@ export const QUERY_STALE_TIMES = {
   export const makePagedRequest = async <T>(
     enpdpoint: string, 
     params?: Record<string, string | number>,
-    cursor?: string, 
+    cursor?: string | null, 
     pageSize: number = 20,
     auth: boolean = true
   ): Promise<{data: T[], nextCursor: string | null}> => {
     const finalParams: Record<string, string | number> = params ?? {};
-    finalParams.cursor = cursor ?? '';
+    if (cursor != null) {
+      finalParams.cursor = cursor;
+    }
     finalParams.pageSize = pageSize;
     const response = await apiRequest<CursorPagedResponse<T>>(enpdpoint,{ method: "GET", params:finalParams, auth});
     return {
       data: response.data,
       nextCursor: response.nextCursor
     }
+  }
+
+  export interface PageParams{
+    cursor: string | null
   }
