@@ -24,11 +24,11 @@ const ImportDefinition = () => {
             <h2>Import {currentContext?.importType === ImportType.TradeList ? "Trade List" : "Watch List"}</h2>
             <div className="lens-definition">
                 <div className="form-group">
-                    <label>Name</label>
-                    <input onChange={(event)=>currentContext?.setNameFunc(event.target.value)}/>
+            <label>Name</label>
+            <input onChange={(event)=>currentContext?.setNameFunc(event.target.value)}/>
                 </div>
-                <input type="file" accept=".csv" onChange={handleFileChange} />
-                {currentContext?.selectedFile && <p>Selected File: {currentContext?.selectedFile.name}</p>}
+            <input type="file" accept=".csv" onChange={handleFileChange} />
+            {currentContext?.selectedFile && <p>Selected File: {currentContext?.selectedFile.name}</p>}
                 <div className="form-group">
                     <label>Ignore First Row</label>
                     <input type="checkbox" onChange={(event)=>currentContext?.setIgnoreFirstRowFunc(event.target.checked)}/>

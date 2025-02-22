@@ -22,6 +22,7 @@ interface WizardContextType {
     setStepFunc: (stepNumber: number) => void;
     setNameFunc: (name: string) => void;
     setFileNameFunc: (fileName: string) => void;
+    setSelectionCriteriaFunc: (selectionCriteria: string[]) => void;
     setSelectedFileFunc: (file: File) => void;
     setFileContentFunc: (fileContent: string) => void;
     setIgnoreFirstRowFunc: (ignore: boolean) => void;
@@ -72,6 +73,7 @@ export const WizardProvider: FC<WizardProviderProps> = ({ importType, setShowImp
             cancel, error, isLoading, step, setStepFunc: setStep,
             setNameFunc: setName,
             setFileNameFunc: setFileName,
+            setSelectionCriteriaFunc : setSelectionCriteria,
             selectedFile,
             setSelectedFileFunc: setSelectedFile,
             fileContent,

@@ -182,6 +182,10 @@ input:focus {
     margin-right: 1rem;
 }
 
+.tradeset-item-label {
+    margin-right: 1rem;
+}
+
 .modal-backdrop {
     position: fixed;
     top: 0;
