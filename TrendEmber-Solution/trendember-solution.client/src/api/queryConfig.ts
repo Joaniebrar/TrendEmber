@@ -24,7 +24,6 @@ export const QUERY_STALE_TIMES = {
   ) : Promise<T> => {
     let url = `${API_BASE_URL}/${endpoint}`;
     
-    console.log(JSON.stringify(body));
     if (params){
       const searchParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) =>
@@ -73,7 +72,6 @@ export const QUERY_STALE_TIMES = {
     body: Record<string, any>,
     auth: boolean = true
   ): Promise<T> => {
-    console.log(JSON.stringify(body));
     return apiRequest(endpoint, { method: "POST", body, auth });
   };
   

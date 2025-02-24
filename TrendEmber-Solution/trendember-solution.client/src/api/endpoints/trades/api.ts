@@ -12,7 +12,6 @@ export const importTradeSets = async ({ file, name, mapping, ignoreFirstRow }: I
   formData.append("name", name);
   formData.append("mapping", mapping);
   formData.append("ignoreFirstRow", ignoreFirstRow.toString());
-  console.log(JSON.stringify(formData));
   return makeCreateRequest<TradeSet>("tradesets",formData,true);  
 };
 
