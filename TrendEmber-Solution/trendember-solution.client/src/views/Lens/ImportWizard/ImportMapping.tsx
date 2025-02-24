@@ -1,15 +1,19 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, FC } from 'react';
 import { WizardContext } from './WizardContext';
 import { ImportType } from '../ImportDetails';
 
-const ImportMapping = () => {
+const ImportMapping: FC = () => {
     const currentContext = useContext(WizardContext);
     const [csvRows, setCsvRows] = useState<string[][]>([]);
     const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
+    if (!currentContext) return null;
+    
+    const { selectedFile, setMappingSelections, importType, selectionCriteria} = currentContext;
+
     useEffect(() => {
-        if (currentContext?.selectedFile) {
-          const file = currentContext.selectedFile;
+        if (selectedFile) {
+          const file = selectedFile;
           const reader = new FileReader();
       
           reader.onload = (e) => {
@@ -31,7 +35,7 @@ const ImportMapping = () => {
       
           reader.readAsText(file);
         }
-      }, [currentContext?.selectedFile]);
+      }, [selectedFile]);
       
       function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>, index: number) {
         const value = event.target.value;
@@ -47,7 +51,7 @@ const ImportMapping = () => {
 
           const cleanedValues = updatedValues.map((v, i) => (i !== index && v === value ? "" : v));
       
-          currentContext?.setMappingSelections(cleanedValues.join(", "));
+          setMappingSelections(cleanedValues.join(", "));
       
           return cleanedValues; 
         });
@@ -55,7 +59,7 @@ const ImportMapping = () => {
 
     return  (
         <div>
-            <h2>{currentContext?.importType === ImportType.TradeList ? "Trade List" : "Watch List"} Mapping</h2>
+            <h2>{importType === ImportType.TradeList ? "Trade List" : "Watch List"} Mapping</h2>
 
       {csvRows.length > 0 && (
         <div className="lens-mapping-table-container">
@@ -66,7 +70,7 @@ const ImportMapping = () => {
                 <th key={index}>
                     <select key={`mapping-${index}`} className="mapping-selection" value={selectedValues[index] || ""} onChange={(e) => handleSelectChange(e, index)}>
                     <option value="">Select an option</option>
-                    {currentContext?.selectionCriteria?.map((option, i) => (
+                    {selectionCriteria?.map((option, i) => (
                         <option key={`mapping-${index}-${i}`} value={option}>
                         {option}
                         </option>
