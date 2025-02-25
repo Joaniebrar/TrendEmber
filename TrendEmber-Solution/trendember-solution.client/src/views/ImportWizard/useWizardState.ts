@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { ImportType } from '../ImportDetails';
+import { ImportType } from './ImportDetails';
 import { useImportTradeSets } from '@api/endpoints/trades/hooks';
+import { useImportWatchLists } from '@api/endpoints/watchList/hooks';
 
 export const useWizardState = (importType: ImportType | undefined, setShowImportWizard: (value: boolean) => void) => {
     const [name, setName] = useState<string>('');
@@ -10,7 +11,7 @@ export const useWizardState = (importType: ImportType | undefined, setShowImport
     const [mappingSelections, setMappingSelections] = useState<string>('');
     const [step, setStep] = useState(0);
     const [ignoreFirstRow, setIgnoreFirstRow] = useState<boolean>(false);
-    const { mutate } = useImportTradeSets();
+    const { mutate } = importType == ImportType.TradeList ? useImportTradeSets() : useImportWatchLists();
 
     const importFunction = async () => {
         if (!selectedFile) return alert('Please select a file.');

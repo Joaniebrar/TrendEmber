@@ -246,37 +246,6 @@ input:focus {
   .lens-mapping-table-container td {
     min-width: 6.25rem;
   }
-  
-  /*.lens-definition {
-    margin: 0 auto;
-    max-width: 90%;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  
-  .lens-definition .form-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem; 
-  }
-  
-  .lens-definition label {
-    white-space: nowrap; 
-    margin-right: 0;
-  }
-  .lens-definition input {
-    min-width: 0;
-    max-width: 15.625rem;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .lens-definition input[type="checkbox"]{
-    max-width: 1rem;    
-  }*/
 
   button:disabled {
     background-color: #d1d1d1;
@@ -295,3 +264,68 @@ input:focus {
   .lens-definition input[type="checkbox"]{
     max-width: 1rem;    
   }
+
+
+  #import-watchlist{
+    margin: 1rem 0.5rem;
+    display: inline-block;
+  }
+
+
+.watchlist-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
+	gap: 1.25rem;
+	margin: 0.625rem;
+	padding: 0.625rem;
+	overflow-y: auto;
+}
+
+.watchlist-set {
+	background-color: #f8f8f8;
+	border: 1px solid #ddd;
+	border-radius: 0.3125rem;
+	padding: 0.9375rem;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
+}
+
+.watchlist-item {
+	margin-bottom: 0.625rem;
+	display: flex;
+	justify-content: space-between;
+}
+
+.watchlist-item-label {
+	font-weight: bold;
+	color: #333;
+}
+
+.watchlist-item-value {
+	color: #666;
+}
+
+.watchlist-set:hover {
+	background-color: #e0e0e0;
+	cursor: pointer;
+}
+
+.watchlist-container {
+	scrollbar-width: thin;
+	scrollbar-color: #888 #e0e0e0;
+}
+
+@media (max-width: 48rem) {
+	.watchlist-container {
+		grid-template-columns: 1fr;
+	}
+}
+
+.watchlist-item-label {
+    margin-right: 1rem;
+}
+
+.watchlist-item-label {
+    margin-right: 1rem;
+}

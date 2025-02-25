@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect, FC } from 'react';
 import { WizardContext } from './WizardContext';
-import { ImportType } from '../ImportDetails';
+import { ImportType } from './ImportDetails';
 
 const ImportMapping: FC = () => {
     const currentContext = useContext(WizardContext);

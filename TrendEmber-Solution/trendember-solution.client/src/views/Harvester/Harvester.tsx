@@ -1,15 +1,15 @@
 import React, { useEffect, useState} from 'react';
-import { FaChartSimple } from 'react-icons/fa6';
-import {useGetTradeSets} from '@api/endpoints/trades/hooks';
-import TradeSetItem  from './TradeSetItem';
+import { FaCloudDownloadAlt } from "react-icons/fa"; 
+import WatchListItem  from './WatchListItem';
 import ImportWizard from '../ImportWizard/ImportWizard';
 import { ImportType } from '../ImportWizard/ImportDetails';
 import { WizardProvider } from '../ImportWizard/WizardContext';
+import { useGetWatchLists } from '@api/endpoints/watchList/hooks';
 
-const Lens= () => {
-    const { data, error, isLoading, fetchNextPage, hasNextPage, isFetchNextPageError } = useGetTradeSets();
+const Harvester= () => {    
+    const { data, error, isLoading, fetchNextPage, hasNextPage, isFetchNextPageError } = useGetWatchLists();
     const [showImportWizard, setShowImportWizard] = useState(false);
-    const [importType, setImportType] = useState<ImportType>(ImportType.TradeList);
+    const [importType, setImportType] = useState<ImportType>(ImportType.WatchList);
     const handleScroll = () => {
         if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 200) {
             if (hasNextPage && !isLoading) {
@@ -31,7 +31,7 @@ const Lens= () => {
 
     return (
         <div className="view-content">
-            <h1><FaChartSimple /> Lens</h1>
+            <h1><FaCloudDownloadAlt /> Harvester</h1>
             {showImportWizard &&
                 (<div className="modal-backdrop">
                     <WizardProvider importType={importType} setShowImportWizard={setShowImportWizard}>
@@ -39,22 +39,21 @@ const Lens= () => {
                     </WizardProvider>
                     </div>
                 )}         
-            <div id="import-tradeset">
-                <button id="import-tradeset-btn" className="import-btn" onClick={() => {setShowImportWizard(true);}}>+ Trade Set</button>
+            <div id="import-watchlist">
+                <button id="import-watchlist-btn" className="import-btn" onClick={() => {setShowImportWizard(true);}}>+ Import Watch List</button>
             </div>
-
-            <div id="tradesets-view">
+            <div id="watchlist-view">
                 <h2>Trade Sets</h2>
                 <div
-                    className="tradeset-container" 
+                    className="watchlist-container" 
                    
                 >
                     {data && (
-                        <div className="trade-set">
+                        <div className="watchlist-set">
                             {data.pages.map((page, index) => (
                                 <React.Fragment key={index}>
                                     {page.data.map((item) => (
-                                        <TradeSetItem key={item.id} tradeSet={item} />
+                                        <WatchListItem key={item.id} watchList={item} />
                                     ))}
                                 </React.Fragment>
                             ))}
@@ -66,4 +65,4 @@ const Lens= () => {
     );
 };
 
-export default Lens;
+export default Harvester;

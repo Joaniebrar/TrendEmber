@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TrendEmber.Data;
@@ -11,9 +12,11 @@ using TrendEmber.Data;
 namespace TrendEmber.Data.Migrations.TrendsDb
 {
     [DbContext(typeof(TrendsDbContext))]
-    partial class TrendsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250224191852_UpdateListEntities")]
+    partial class UpdateListEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,9 +112,15 @@ namespace TrendEmber.Data.Migrations.TrendsDb
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Market")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Symbol")
                         .IsRequired()

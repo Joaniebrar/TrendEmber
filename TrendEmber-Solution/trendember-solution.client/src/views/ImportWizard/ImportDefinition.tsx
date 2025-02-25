@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { WizardContext } from './WizardContext';
-import { ImportType } from '../ImportDetails';
+import { ImportType } from './ImportDetails';
 
 const ImportDefinition = () => {
     const currentContext = useContext(WizardContext);
