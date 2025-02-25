@@ -10,7 +10,8 @@ namespace TrendEmber.Contract.Mappers
             Id = watchList.Id,
             Name = watchList.Name,
             ImportedDate = watchList.ImportedDate.ToUniversalTime().ToString("o"),
-            SymbolCount = watchList.Symbols.Count()
+            SymbolCount = watchList.Symbols.Count(),
+            AgentStatus = watchList.Agent == null ? string.Empty : watchList.Agent.Status.ToString()
         };
     }
 }

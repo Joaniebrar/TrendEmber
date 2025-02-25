@@ -132,7 +132,7 @@ namespace TrendEmber.Service
 
         public async Task<(IEnumerable<WatchList>, string? nextCursor)> GetWatchListsAsync(string? cursor, int pageSize)
         {
-            var query = _dbContext.WatchList.Include(q => q.Symbols).OrderByDescending(ts => ts.ImportedDate).AsQueryable();
+            var query = _dbContext.WatchList.Include(x=>x.Agent).Include(q => q.Symbols).OrderByDescending(ts => ts.ImportedDate).AsQueryable();
 
             if (!string.IsNullOrEmpty(cursor) && DateTime.TryParse(cursor, out var lastDate))
             {
