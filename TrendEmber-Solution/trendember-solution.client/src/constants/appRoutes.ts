@@ -1,11 +1,12 @@
 import { /*FaChartLine,*/FaChartSimple } from 'react-icons/fa6';
-import { FaHome,/*FaCloudDownloadAlt*/ } from "react-icons/fa"; 
+import { FaHome,FaCloudDownloadAlt } from "react-icons/fa"; 
 //import { GiElectricalResistance, GiArtificialIntelligence } from "react-icons/gi";
 import { IoMdLogOut } from "react-icons/io";
 //import { PiStrategy } from "react-icons/pi";
 import { IconType } from "react-icons";
 import HomePage from '../views/Home/Home';
 import LensPage from '../views/Lens/Lens';
+import HarvesterPage from '../views/Harvester/Harvester';
 import LoginPage from '../views/Login/Login';
 
 export interface ViewItem {
@@ -20,18 +21,21 @@ export interface NavigationItem extends ViewItem{
 
 const homeId = "home-nav";
 const lensId = "lens-nav";
+const harvesterId = "harvest-nav";
 const loginId = "login-nav";
 const logoutId = "logout-nav";
 
 const navigationMetadata: Record<string, {icon: IconType, display:string}>= {
     [homeId]: { display: 'Home', icon: FaHome},
     [lensId]: { display: 'Lens', icon: FaChartSimple},
+    [harvesterId]: { display: 'Harvester', icon: FaCloudDownloadAlt},
     [logoutId]: { display: 'Logout', icon: IoMdLogOut },    
 };
 
 const viewItems: ViewItem[] = [
     {id: homeId,view: HomePage, path:'/'},
     {id: lensId,view: LensPage, path:'/Lens'},
+    {id: harvesterId,view: HarvesterPage, path:'/Harvester'},
     {id: loginId,view: LoginPage, path:'/Login'},
     {id: logoutId, view: HomePage, path:'/Logout'}
 ];

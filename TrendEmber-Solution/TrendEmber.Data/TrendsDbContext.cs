@@ -13,6 +13,9 @@ namespace TrendEmber.Data
         public DbSet<TradeSet> TradeSets { get; set; }
         public DbSet<Trade> Trades { get; set; }
 
+        public DbSet<WatchList> WatchList { get; set; }
+        public DbSet<WatchListSymbol> Symbols { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Trade>()

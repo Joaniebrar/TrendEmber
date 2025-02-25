@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Text.RegularExpressions;
 using TrendEmber.Core.Trends;
 using TrendEmber.Data;
@@ -128,6 +127,91 @@ namespace TrendEmber.Service
             catch (Exception ex)
             {                
                 return new Result<object>(false, $"Error importing trades: {ex.Message}", name);
+            }
+        }
+
+        public async Task<(IEnumerable<WatchList>, string? nextCursor)> GetWatchListsAsync(string? cursor, int pageSize)
+        {
+            var query = _dbContext.WatchList.Include(q => q.Symbols).OrderByDescending(ts => ts.ImportedDate).AsQueryable();
+
+            if (!string.IsNullOrEmpty(cursor) && DateTime.TryParse(cursor, out var lastDate))
+            {
+                query = query.Where(ts => ts.ImportedDate < lastDate.ToUniversalTime());
+            }
+
+            var watchLists = await query.Take(pageSize).ToListAsync();
+            var nextCursor = watchLists.Any() ? watchLists.Last().ImportedDate.ToString("O") : null;
+            return (watchLists, nextCursor);
+        }
+
+        public async Task<Result<object>> ImportWatchListAsync(string? file, string name, string mapping, bool ignoreFirstRow)
+        {
+            var importDate = DateTime.UtcNow;
+
+            var watchList = new WatchList(name)
+            {
+                ImportedDate = importDate
+            };
+
+            var mappingColumns = mapping.Split(',').Select(m => m.Trim()).ToArray();
+
+            if (string.IsNullOrEmpty(file))
+            {
+                return new Result<object>(false, "No file provided", name);
+            }
+
+            try
+            {
+                using (var reader = new StringReader(file))
+                {
+                    string? line;
+                    bool isFirstRow = true;
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (isFirstRow && ignoreFirstRow)
+                        {
+                            isFirstRow = false;
+                            continue;
+                        }
+
+                        var values = ParseCsvLine(line);
+
+                        var importedSymbol = new Dictionary<string, string>();
+
+                        for (int i = 0; i < mappingColumns.Length; i++)
+                        {
+                            var key = mappingColumns[i];
+                            var value = i < values.Count() ? values[i].Trim() : string.Empty;
+
+                            if (!string.IsNullOrEmpty(value))
+                            {
+                                importedSymbol[key] = value;
+                            }
+                        }
+
+                        var watchListSymbol = importedSymbol.GetValueOrDefault("Symbol")?.Split(":");
+                        if (watchListSymbol?.Length==2)
+                        {
+                            var symbolToAdd = new WatchListSymbol
+                            {
+                                Symbol = watchListSymbol[1],
+                                Market = watchListSymbol[0],
+                                CompanyName = string.Empty
+                            };
+                            watchList.Symbols.Add(symbolToAdd);
+                        }
+                    }
+                }
+                _dbContext.Add(watchList);
+
+                await _dbContext.SaveChangesAsync();
+
+                return new Result<object>(true, "WatchList imported successfully", watchList);
+            }
+            catch (Exception ex)
+            {
+                return new Result<object>(false, $"Error importing watch list symbols: {ex.Message}", name);
             }
         }
     }

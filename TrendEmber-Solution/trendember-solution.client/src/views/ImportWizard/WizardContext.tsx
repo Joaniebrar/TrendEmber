@@ -1,6 +1,6 @@
 import { FC, createContext } from 'react';
 import { useWizardState } from './useWizardState';
-import { ImportType } from '../ImportDetails';
+import { ImportType } from './ImportDetails';
 
 interface WizardProviderProps {
     importType: ImportType | undefined;
