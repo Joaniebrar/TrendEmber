@@ -3,4 +3,5 @@ export interface WatchList {
     importedDate: string;
     name: string;
     symbolCount: number;
+    agentStatus: string;
 }

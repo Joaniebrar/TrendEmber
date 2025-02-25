@@ -7,12 +7,14 @@ import { IconType } from "react-icons";
 import HomePage from '../views/Home/Home';
 import LensPage from '../views/Lens/Lens';
 import HarvesterPage from '../views/Harvester/Harvester';
+import WatchListPage from '../views/Harvester/WatchList';
 import LoginPage from '../views/Login/Login';
 
 export interface ViewItem {
     id: string;
     view: React.ComponentType<any>;
     path: string;
+    menuItem: boolean
 }
 export interface NavigationItem extends ViewItem{
     icon: IconType;
@@ -24,6 +26,7 @@ const lensId = "lens-nav";
 const harvesterId = "harvest-nav";
 const loginId = "login-nav";
 const logoutId = "logout-nav";
+const watchListId = "watchlist-view";
 
 const navigationMetadata: Record<string, {icon: IconType, display:string}>= {
     [homeId]: { display: 'Home', icon: FaHome},
@@ -33,21 +36,24 @@ const navigationMetadata: Record<string, {icon: IconType, display:string}>= {
 };
 
 const viewItems: ViewItem[] = [
-    {id: homeId,view: HomePage, path:'/'},
-    {id: lensId,view: LensPage, path:'/Lens'},
-    {id: harvesterId,view: HarvesterPage, path:'/Harvester'},
-    {id: loginId,view: LoginPage, path:'/Login'},
-    {id: logoutId, view: HomePage, path:'/Logout'}
+    {id: homeId,view: HomePage, path:'/', menuItem:true},
+    {id: lensId,view: LensPage, path:'/Lens', menuItem:true},
+    {id: harvesterId,view: HarvesterPage, path:'/Harvester', menuItem:true},
+    {id: watchListId,view: WatchListPage, path:'/watchlist/:id', menuItem:false},
+    {id: loginId,view: LoginPage, path:'/Login', menuItem:false},
+    {id: logoutId, view: HomePage, path:'/Logout', menuItem:true}
 ];
 export const navigationItems: NavigationItem[] = 
     viewItems
-        .filter(item => item.id !== loginId)
+        .filter(item => item.menuItem)
         .map(item =>({
             ...item,
             ...navigationMetadata[item.id],
         }));
 export const loginView = viewItems.find(item=>item.id==loginId) as ViewItem;
 export const routableViews = viewItems.filter(item=>item.id !==loginId && item.id !==logoutId);
+export const WatchListView = viewItems.find(item=>item.id==watchListId) as ViewItem;
+export const HarvesterView = viewItems.find(item=>item.id==harvesterId) as ViewItem;
 /*
     { id: "home-nav", display: 'Home', icon: FaHome , path: '/' },
     {  id: "lens-nav",display: 'Lens', icon: FaChartSimple, path: '/Lens' },

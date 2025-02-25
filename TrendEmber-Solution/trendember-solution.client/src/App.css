@@ -329,3 +329,18 @@ input:focus {
 .watchlist-item-label {
     margin-right: 1rem;
 }
+
+.status-bulb {
+  border-radius: 50%;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+
+.agent-status-red {
+  color: #ef4444;
+}
+
+.agent-status-green {
+  color: #10b981;
+}
