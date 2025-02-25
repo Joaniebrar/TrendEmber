@@ -344,3 +344,7 @@ input:focus {
 .agent-status-green {
   color: #10b981;
 }
+
+.watchListContent {
+  margin-top: 60px;
+}

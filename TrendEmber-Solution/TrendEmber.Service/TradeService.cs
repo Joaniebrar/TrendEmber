@@ -144,6 +144,11 @@ namespace TrendEmber.Service
             return (watchLists, nextCursor);
         }
 
+        public async Task<IEnumerable<WatchListSymbol>> GetWatchListSymbolsAsync(Guid watchListId) {
+            var query = _dbContext.Symbols.Where(x => x.WatchListId == watchListId).AsQueryable();
+            return await query.ToListAsync();            
+        }
+
         public async Task<Result<object>> ImportWatchListAsync(string? file, string name, string mapping, bool ignoreFirstRow)
         {
             var importDate = DateTime.UtcNow;

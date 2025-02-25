@@ -9,6 +9,7 @@ namespace TrendEmber.Service
 
         public Task<(IEnumerable<WatchList>, string? nextCursor)> GetWatchListsAsync(string? cursor, int pageSize);
         public Task<Result<object>> ImportWatchListAsync(string? file, string name, string mapping, bool ignoreFirstRow);
+        public Task<IEnumerable<WatchListSymbol>> GetWatchListSymbolsAsync(Guid watchListId);
 
     }
 }
