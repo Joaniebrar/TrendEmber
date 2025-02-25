@@ -12,5 +12,8 @@ namespace TrendEmber.Contract
         public string ImportedDate { get; set; } = string.Empty;
         [Range(0, int.MaxValue)]
         public int SymbolCount { get; set; }
+        [Required]
+        [StringLength(100, MinimumLength = 1)]
+        public string AgentStatus { get; set; } = string.Empty;
     }
 }
