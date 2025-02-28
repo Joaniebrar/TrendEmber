@@ -16,10 +16,10 @@ const WatchListPage = () => {
     return (
     <div className="watchListContent">
         <div className="watchlist-container-header"> 
-            <div role="button" tabIndex={0} style={{ cursor: "pointer" }} 
-                onClick={()=>{navigate(HarvesterView.path);}}><IoChevronBackCircleSharp /> Back to Harvester</div>    
+        <div role="button" tabIndex={0} style={{ cursor: "pointer" }} 
+            onClick={()=>{navigate(HarvesterView.path);}}><IoChevronBackCircleSharp /> Back to Harvester</div>
             <div className="watchlist-agent-header-row">
-                <h2>Watch list {watchList.name}</h2>
+            <h2>Watch list {watchList.name}</h2>
                 <button id="run-agent" onClick={()=> runAgent(watchList.id)}>Run Agent</button>
             </div>
         </div>                    
