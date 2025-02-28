@@ -8,6 +8,9 @@ export const QUERY_STALE_TIMES = {
     data: T[];
     nextCursor: string | null;
   }
+  export interface GetResponse<T>{
+    data: T[];    
+  }
   const API_BASE_URL = "api";
 
   type RequestOptions = {
@@ -22,7 +25,7 @@ export const QUERY_STALE_TIMES = {
     endpoint: string,
     { method = "GET", body, params, auth=true}: RequestOptions = {}
   ) : Promise<T> => {
-    let url = `${API_BASE_URL}/${endpoint}`;
+    let url = `/${API_BASE_URL}/${endpoint}`;
     
     if (params){
       const searchParams = new URLSearchParams();
@@ -63,8 +66,11 @@ export const QUERY_STALE_TIMES = {
     endpoint: string,
     params?: Record<string, string | number>,
     auth: boolean = true
-  ): Promise<T> => {
-    return apiRequest(endpoint, { method: "GET", params, auth });
+  ): Promise<{data: T[]}> => {
+    const response =  await apiRequest<T[]>(endpoint, { method: "GET", params, auth });
+    return {
+      data: response
+    }
   };
   
   export const makeCreateRequest = async <T>(

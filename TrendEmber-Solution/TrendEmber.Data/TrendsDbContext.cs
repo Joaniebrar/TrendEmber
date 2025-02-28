@@ -23,6 +23,25 @@ namespace TrendEmber.Data
                 .WithMany(ts => ts.Trades)
                 .HasForeignKey(t => t.TradeSetId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WatchListSymbol>()
+                .HasOne(wls => wls.WatchList)
+                .WithMany(wl => wl.Symbols)
+                .HasForeignKey(wls => wls.WatchListId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WatchList>()
+                .HasOne(w => w.Agent)
+                .WithOne(a => a.WatchList)
+                .HasForeignKey<WatchList>(w => w.HarvesterAgentId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<HarvesterAgent>()
+                .HasOne(ha => ha.ApiProvider)
+                .WithMany(ap => ap.Agents)
+                .HasForeignKey(ha => ha.ApiProviderId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

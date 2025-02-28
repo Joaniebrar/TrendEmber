@@ -1,7 +1,7 @@
-import { useInfiniteQuery, useMutation,useQueryClient  } from "@tanstack/react-query";
-import { getWatchLists, importWatchLists, ImportWatchListsParams } from "./api";
-import { QUERY_STALE_TIMES,CursorPagedResponse } from "@api/queryConfig"; 
-import { WatchList} from './models'
+import { useInfiniteQuery, useMutation,useQueryClient, useQuery   } from "@tanstack/react-query";
+import { getWatchLists, importWatchLists, ImportWatchListsParams, getWatchListSymbols } from "./api";
+import { QUERY_STALE_TIMES,CursorPagedResponse, GetResponse } from "@api/queryConfig"; 
+import { WatchList, WatchListSymbol} from './models'
 
 export const useGetWatchLists = () => {
   return useInfiniteQuery<CursorPagedResponse<WatchList>>({
@@ -28,5 +28,13 @@ export const useImportWatchLists = () => {
     onError: (error) => {
       console.error("Import failed:", error);
     },
+  });
+};
+
+export const useGetWatchListSymbols = (watchlistId: string) => {
+  return useQuery<GetResponse<WatchListSymbol>, Error>({
+    queryKey: ["watchlistsymbols", watchlistId], 
+    queryFn: () => getWatchListSymbols(watchlistId),
+    enabled: !!watchlistId, 
   });
 };
