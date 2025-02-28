@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TrendEmber.Data;
@@ -11,9 +12,11 @@ using TrendEmber.Data;
 namespace TrendEmber.Data.Migrations.TrendsDb
 {
     [DbContext(typeof(TrendsDbContext))]
-    partial class TrendsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250227211910_AddEquityPriceHistory")]
+    partial class AddEquityPriceHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

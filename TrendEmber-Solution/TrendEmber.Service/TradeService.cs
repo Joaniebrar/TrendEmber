@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using System.Net.Http;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using TrendEmber.Core.Trends;
 using TrendEmber.Data;
@@ -218,6 +221,81 @@ namespace TrendEmber.Service
             {
                 return new Result<object>(false, $"Error importing watch list symbols: {ex.Message}", name);
             }
+        }
+        private DateTime ConverUnixTimeStampToDateTime(long unixTimestampMilliseconds)
+        {
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(unixTimestampMilliseconds);
+            return dateTimeOffset.UtcDateTime; ;
+        }
+        public async Task RunAgentForWatchlist(Guid watchListId)
+        {
+            var watchList= await _dbContext
+                    .WatchList
+                    .Include(x => x.Symbols)
+                    .Include(x => x.Agent)
+                        .ThenInclude(a => a.ApiProvider)
+                    .Where(x=>x.Id == watchListId)
+                    .FirstAsync();
+            List<DateTime> CallTimestamps = new List<DateTime>();
+            
+            foreach (var symbol in 
+                        watchList.Symbols.OrderBy(x=>x.Symbol)
+                            .Where(i=> string.Compare(i.Symbol, "MCHP", StringComparison.Ordinal) >= 0))
+            {
+                var httpClient = new HttpClient();
+                var lastRun = symbol.LastImportedDate?.ToString("yyyy-MM-dd") ?? "2022-01-01";
+                if (lastRun == "0001-01-01")
+                    lastRun = "2005-01-01";
+                var thisweek = DateTime.Now.ToString("yyyy-MM-dd");
+                var done = false;
+                try
+                {
+                    var priceHistory = new List<EquityPriceHistory>();
+                    var formattedUrl = string.Format(watchList.Agent.ApiProvider.BaseUrl, symbol.Symbol, lastRun, thisweek, "");
+                    if (CallTimestamps.Count >= 5)
+                    {
+                        Task.Delay(TimeSpan.FromMinutes(1)).Wait();
+                        CallTimestamps.Clear();
+                    }
+                    CallTimestamps.Add(DateTime.UtcNow);
+                    HttpResponseMessage response = await httpClient.GetAsync(formattedUrl);
+                    response.EnsureSuccessStatusCode();
+
+                    string responseData = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<PolyGonIOApiResponse>(responseData);
+                    if (apiResponse.results.Count > 0)
+                    {
+                        thisweek = ConverUnixTimeStampToDateTime(apiResponse.results[0].t).ToString("yyyy-MM-dd");
+                    }
+                    foreach (var item in apiResponse.results)
+                    {
+                        priceHistory.Add(new EquityPriceHistory()
+                        {
+                            Symbol = symbol.Symbol,
+                            Volume = item.v,
+                            VolumeWeighted = item.vw,
+                            Open = item.o,
+                            Close = item.c,
+                            High = item.h,
+                            Low = item.l,
+                            PriceDate = ConverUnixTimeStampToDateTime(item.t),
+                            RawPriceDatee = item.t,
+                            ChartTime = ChartTime.Weekly,
+                        });
+                    }
+                    var rangeToAdd = priceHistory.DistinctBy(x=>x.PriceDate).ToList();
+                    await _dbContext.AddRangeAsync(rangeToAdd);
+                    symbol.LastImportedDate = DateTime.UtcNow;
+                    await _dbContext.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                    return;
+                }
+
+            }
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

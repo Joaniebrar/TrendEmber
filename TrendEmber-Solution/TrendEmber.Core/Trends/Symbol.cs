@@ -9,5 +9,6 @@ namespace TrendEmber.Core.Trends
         public string Market { get; set; } = string.Empty;
         public string Symbol { get; set; } = string.Empty;
         public WatchList WatchList { get; set; }
+        public DateTime? LastImportedDate { get; set; }
     }
 }

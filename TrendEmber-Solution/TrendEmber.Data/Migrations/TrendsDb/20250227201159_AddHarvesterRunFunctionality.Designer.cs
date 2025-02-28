@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TrendEmber.Data;
@@ -11,9 +12,11 @@ using TrendEmber.Data;
 namespace TrendEmber.Data.Migrations.TrendsDb
 {
     [DbContext(typeof(TrendsDbContext))]
-    partial class TrendsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250227201159_AddHarvesterRunFunctionality")]
+    partial class AddHarvesterRunFunctionality
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,51 +42,6 @@ namespace TrendEmber.Data.Migrations.TrendsDb
                     b.HasKey("Id");
 
                     b.ToTable("ApiProviders");
-                });
-
-            modelBuilder.Entity("TrendEmber.Core.Trends.EquityPriceHistory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("ChartTime")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Close")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("High")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("Low")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("Open")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("PriceDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("RawPriceDatee")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Symbol")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("Volume")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("VolumeWeighted")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Symbol", "PriceDate")
-                        .HasDatabaseName("IX_Symbol_PriceDate");
-
-                    b.ToTable("EquityPrices");
                 });
 
             modelBuilder.Entity("TrendEmber.Core.Trends.HarvesterAgent", b =>
@@ -198,7 +156,7 @@ namespace TrendEmber.Data.Migrations.TrendsDb
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("LastImportedDate")
+                    b.Property<DateTime>("LastImportedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Market")

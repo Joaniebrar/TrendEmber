@@ -16,6 +16,10 @@ namespace TrendEmber.Data
         public DbSet<WatchList> WatchList { get; set; }
         public DbSet<WatchListSymbol> Symbols { get; set; }
 
+        public DbSet<HarvesterAgent> Agents { get; set; }
+        public DbSet<ApiProvider> ApiProviders { get; set; }
+        public DbSet<EquityPriceHistory> EquityPrices { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Trade>()
@@ -42,6 +46,10 @@ namespace TrendEmber.Data
                 .WithMany(ap => ap.Agents)
                 .HasForeignKey(ha => ha.ApiProviderId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<EquityPriceHistory>()
+                .HasIndex(e => new { e.Symbol, e.PriceDate })
+                .HasDatabaseName("IX_Symbol_PriceDate");
         }
     }
 }
