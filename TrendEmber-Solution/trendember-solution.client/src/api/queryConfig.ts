@@ -9,7 +9,7 @@ export const QUERY_STALE_TIMES = {
     nextCursor: string | null;
   }
   export interface GetResponse<T>{
-    data: T[];    
+    data: T;    
   }
   const API_BASE_URL = "api";
 
@@ -63,6 +63,17 @@ export const QUERY_STALE_TIMES = {
   };
 
   export const makeGetRequest = async <T>(
+    endpoint: string,
+    params?: Record<string, string | number>,
+    auth: boolean = true
+  ): Promise<{data: T}> => {
+    const response =  await apiRequest<T>(endpoint, { method: "GET", params, auth });
+    return {
+      data: response
+    }
+  };
+
+  export const makeGetListRequest = async <T>(
     endpoint: string,
     params?: Record<string, string | number>,
     auth: boolean = true
