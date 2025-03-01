@@ -9,6 +9,7 @@ import LensPage from '../views/Lens/Lens';
 import HarvesterPage from '../views/Harvester/Harvester';
 import WatchListPage from '../views/Harvester/WatchList';
 import LoginPage from '../views/Login/Login';
+import TrainerPage from '../views/Trainer/Trainer';
 
 export interface ViewItem {
     id: string;
@@ -27,6 +28,7 @@ const harvesterId = "harvest-nav";
 const loginId = "login-nav";
 const logoutId = "logout-nav";
 const watchListId = "watchlist-view";
+const trainerId = "trainer-view";
 
 const navigationMetadata: Record<string, {icon: IconType, display:string}>= {
     [homeId]: { display: 'Home', icon: FaHome},
@@ -41,7 +43,8 @@ const viewItems: ViewItem[] = [
     {id: harvesterId,view: HarvesterPage, path:'/Harvester', menuItem:true},
     {id: watchListId,view: WatchListPage, path:'/watchlist/:id', menuItem:false},
     {id: loginId,view: LoginPage, path:'/Login', menuItem:false},
-    {id: logoutId, view: HomePage, path:'/Logout', menuItem:true}
+    {id: logoutId, view: HomePage, path:'/Logout', menuItem:true},
+    {id: trainerId,view: TrainerPage, path:'/Trainer', menuItem:false},
 ];
 export const navigationItems: NavigationItem[] = 
     viewItems

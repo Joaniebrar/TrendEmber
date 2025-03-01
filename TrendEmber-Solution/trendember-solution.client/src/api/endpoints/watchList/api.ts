@@ -1,4 +1,4 @@
-import { makePagedRequest, makeCreateRequest, PageParams, makeGetRequest} from '@api/queryConfig';
+import { makePagedRequest, makeCreateRequest, PageParams, makeGetListRequest} from '@api/queryConfig';
 import { WatchList, WatchListSymbol } from './models';
 
 export const getWatchLists = async ({ cursor }: PageParams) => {  
@@ -25,5 +25,5 @@ export interface ImportWatchListsParams{
 export const getWatchListSymbols = async (watchlistId : string) => {  
   const params: Record<string, string | number> = {};  
   params['watchListId']=watchlistId;
-  return makeGetRequest<WatchListSymbol>("watchlistsymbols",params,true);  
+  return makeGetListRequest<WatchListSymbol>("watchlistsymbols",params,true);  
 };
