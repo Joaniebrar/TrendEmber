@@ -240,12 +240,12 @@ namespace TrendEmber.Service
             
             foreach (var symbol in 
                         watchList.Symbols.OrderBy(x=>x.Symbol)
-                            .Where(i=> string.Compare(i.Symbol, "MCHP", StringComparison.Ordinal) >= 0))
+                            .Where(i=> string.Compare(i.Symbol, "SHOP", StringComparison.Ordinal) > 0))
             {
                 var httpClient = new HttpClient();
                 var lastRun = symbol.LastImportedDate?.ToString("yyyy-MM-dd") ?? "2022-01-01";
                 if (lastRun == "0001-01-01")
-                    lastRun = "2005-01-01";
+                    lastRun = "2022-01-01";
                 var thisweek = DateTime.Now.ToString("yyyy-MM-dd");
                 var done = false;
                 try
