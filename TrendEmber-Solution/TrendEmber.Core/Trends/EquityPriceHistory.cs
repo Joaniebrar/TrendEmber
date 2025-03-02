@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace TrendEmber.Core.Trends
 {
     public class EquityPriceHistory
@@ -19,5 +14,9 @@ namespace TrendEmber.Core.Trends
         public DateTime PriceDate { get; set; }
         public decimal RawPriceDatee { get; set; }
         public ChartTime ChartTime { get; set; }
+        public CandleShape? Shape { get; set; }    
+
+        public double? RangeZScore { get; set; }
+
     }
 }

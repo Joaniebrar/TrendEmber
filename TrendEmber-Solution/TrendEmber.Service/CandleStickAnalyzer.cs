@@ -1,4 +1,7 @@
 ﻿
+using System;
+using TrendEmber.Core;
+
 namespace TrendEmber.Service
 {
     public static class CandleStickAnalyzer
@@ -28,7 +31,26 @@ namespace TrendEmber.Service
                    Math.Min(open, close) <= low + range;
         }
 
+        public static bool IsTailBar(decimal open, decimal close, decimal high, decimal low)
+        {
+            var range = low + (high - low) / 3;
+            return open >= range && close >= range;
+        }
+        public static double CalculateZScore(decimal high, decimal low, double mean, double standardDeviation)
+        {
+            var range = (double)(high - low);
+            return (range - mean) / standardDeviation;
+        }
 
+        public static CandleShape CalculateCandleShape(decimal open, decimal close, decimal high, decimal low) =>
+            IsHammer(open, close, high, low) ? CandleShape.Hammer :
+            IsDoji(open, close, high, low) ? CandleShape.Doji :
+            IsTailBar(open, close, high, low) ? CandleShape.TailBar :
+            IsFullBar(open, close, high, low) ? CandleShape.FullBar :
+            CandleShape.Unknown;
 
     }
+
+
+
 }
