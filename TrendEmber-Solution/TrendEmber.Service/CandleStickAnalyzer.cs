@@ -8,7 +8,7 @@ namespace TrendEmber.Service
     {
         public static bool IsDoji(decimal open, decimal close, decimal high, decimal low)
         {
-            decimal range = (high - low) / 3;
+            decimal range = (high - low) / 4;
             decimal threshold = low + range;
             return open >= threshold && close >= threshold && Math.Abs(open - close) <= range;
         }
@@ -26,14 +26,15 @@ namespace TrendEmber.Service
         }
         public static bool IsFullBar(decimal open, decimal close, decimal high, decimal low)
         {
-            decimal range = (high - low) / 6;
-            return Math.Max(open, close) >= high - range &&
-                   Math.Min(open, close) <= low + range;
+            var grace = (high - low) / 2.15m;
+            var top = Math.Max(open, close);
+            var bottom = Math.Min(open, close);
+            return grace >= (high - top) + (bottom - low);
         }
 
         public static bool IsTailBar(decimal open, decimal close, decimal high, decimal low)
         {
-            var range = low + (high - low) / 3;
+            var range = low + (high - low) / 2.75m;
             return open >= range && close >= range;
         }
         public static double CalculateZScore(decimal high, decimal low, double mean, double standardDeviation)
