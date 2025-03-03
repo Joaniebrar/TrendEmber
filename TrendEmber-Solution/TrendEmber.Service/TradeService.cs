@@ -8,6 +8,13 @@ using TrendEmber.Data;
 
 namespace TrendEmber.Service
 {
+    public class EquityStats
+    {
+        public string Symbol { get; set; }
+        public double Mean { get; set; }
+        public double StandardDeviation { get; set; }
+    }
+
     public class TradeService : ITradeService
     {
         private TrendsDbContext _dbContext;
@@ -222,11 +229,9 @@ namespace TrendEmber.Service
                 return new Result<object>(false, $"Error importing watch list symbols: {ex.Message}", name);
             }
         }
-        private DateTime ConverUnixTimeStampToDateTime(long unixTimestampMilliseconds)
-        {
-            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(unixTimestampMilliseconds);
-            return dateTimeOffset.UtcDateTime; ;
-        }
+        private DateTime ConverUnixTimeStampToDateTime(long unixTimestampMilliseconds) =>
+            DateTimeOffset.FromUnixTimeMilliseconds(unixTimestampMilliseconds).UtcDateTime;
+
         public async Task RunAgentForWatchlist(Guid watchListId)
         {
             var watchList= await _dbContext
@@ -239,8 +244,7 @@ namespace TrendEmber.Service
             List<DateTime> CallTimestamps = new List<DateTime>();
             
             foreach (var symbol in 
-                        watchList.Symbols.OrderBy(x=>x.Symbol)
-                            .Where(i=> string.Compare(i.Symbol, "SHOP", StringComparison.Ordinal) > 0))
+                        watchList.Symbols.OrderBy(x=>x.Symbol))
             {
                 var httpClient = new HttpClient();
                 var lastRun = symbol.LastImportedDate?.ToString("yyyy-MM-dd") ?? "2022-01-01";
@@ -297,5 +301,50 @@ namespace TrendEmber.Service
             }
             await _dbContext.SaveChangesAsync();
         }
+
+        public void CalculateMeanAndStandardDeviation()
+        {
+            var calculatedResults=_dbContext.EquityPrices
+                .AsEnumerable() 
+                .GroupBy(e => e.Symbol)
+                .Select(g =>
+                {
+                    var ranges = g.Select(e => (double)(e.High - e.Low)).ToList();
+                    var mean = ranges.Average();
+                    var stdDev = Math.Sqrt(ranges.Sum(p => Math.Pow(p - mean, 2)) / ranges.Count);
+
+                    return new EquityStats
+                    {
+                        Symbol = g.Key,
+                        Mean = mean,
+                        StandardDeviation = stdDev
+                    };
+                })
+                .ToDictionary(stat => stat.Symbol);
+            foreach (var symbol in _dbContext.Symbols) {
+                var symbolStats = calculatedResults[symbol.Symbol];
+                symbol.MeanRange = symbolStats.Mean;
+                symbol.StandardDeviation = symbolStats.StandardDeviation;
+            }
+            _dbContext.SaveChanges();
+        }
+
+        public void CalculatePriceHistoryShapeZScore()
+        {
+            var symbols = _dbContext.Symbols.ToDictionary(stat => stat.Symbol);
+            foreach (var priceEvent in _dbContext.EquityPrices)
+            {
+               var symbol= symbols[priceEvent.Symbol];
+                if (symbol.MeanRange.HasValue && symbol.StandardDeviation.HasValue)
+                {
+                    priceEvent.RangeZScore = CandleStickAnalyzer.CalculateZScore(priceEvent.High, priceEvent.Low, symbol.MeanRange.Value, symbol.StandardDeviation.Value);
+                    priceEvent.Shape = CandleStickAnalyzer.CalculateCandleShape(priceEvent.Open, priceEvent.Close, priceEvent.High, priceEvent.Low);
+                }
+
+            }
+            _dbContext.SaveChanges();
+        }
+
     }
+
 }

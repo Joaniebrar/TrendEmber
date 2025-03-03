@@ -18,7 +18,8 @@ const Trainer = () => {
   const [isDoji,setDojiFlag] = useState(false);
   const [isHammer,setHammerFlag] = useState(false);
   const [isFullBar,setFullBarFlag] = useState(false);
-  
+  const [isTailBar,setTailBarFlag] = useState(false);
+
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
@@ -69,6 +70,11 @@ function calculateIsFullBar(open: number, close: number, high: number, low: numb
          Math.min(open, close) <= low + range;
 }
 
+function calculateIsTailBar(open: number, close: number, high: number, low: number): boolean {
+  const range = low + (high - low) / 3;
+  return open >= range && close >= range;
+}
+
 
 
   useEffect(() => {
@@ -83,6 +89,7 @@ function calculateIsFullBar(open: number, close: number, high: number, low: numb
         setDojiFlag(calculateIsDoji(data.data.open,data.data.close,data.data.high,data.data.low));
         setHammerFlag(calculateIsHammer(data.data.open,data.data.close,data.data.high,data.data.low));
         setFullBarFlag(calculateIsFullBar(data.data.open,data.data.close,data.data.high,data.data.low));
+        setTailBarFlag(calculateIsTailBar(data.data.open,data.data.close,data.data.high,data.data.low));
       }
     }
   }, [data]);
@@ -98,6 +105,7 @@ function calculateIsFullBar(open: number, close: number, high: number, low: numb
   {isDoji && <p>IT IS A DOJI</p>}
   {isHammer && <p>IT IS A HAMMER</p>}
   {isFullBar && <p>IT IS A FULL BAR</p>}
+  {isTailBar && <p>IT IS A Tail BAR</p>}
   <div ref={chartContainerRef} style={{ width: '100%', height: '400px' }} />
   </div>);
 };

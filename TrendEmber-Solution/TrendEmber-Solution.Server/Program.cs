@@ -134,6 +134,10 @@ using (var scope = app.Services.CreateScope())
 
     var trendsDbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
     trendsDbContext.Database.Migrate();
+    var tradeService = scope.ServiceProvider.GetRequiredService<ITradeService>();
+    tradeService.CalculateMeanAndStandardDeviation();
+    tradeService.CalculatePriceHistoryShapeZScore();
+
 }
 
 app.UseAuthentication();

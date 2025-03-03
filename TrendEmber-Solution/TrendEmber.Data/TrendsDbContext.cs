@@ -51,5 +51,6 @@ namespace TrendEmber.Data
                 .HasIndex(e => new { e.Symbol, e.PriceDate })
                 .HasDatabaseName("IX_Symbol_PriceDate");
         }
+      
     }
 }

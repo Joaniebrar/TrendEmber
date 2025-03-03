@@ -10,5 +10,7 @@ namespace TrendEmber.Core.Trends
         public string Symbol { get; set; } = string.Empty;
         public WatchList WatchList { get; set; }
         public DateTime? LastImportedDate { get; set; }
+        public double? MeanRange { get; set; }
+        public double? StandardDeviation { get; set; }
     }
 }
