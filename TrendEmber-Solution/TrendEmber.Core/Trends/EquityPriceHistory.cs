@@ -19,6 +19,10 @@ namespace TrendEmber.Core.Trends
         public double? RangeZScore { get; set; }
 
         public ICollection<WavePoint> WavePoints { get; set; } = new List<WavePoint>();
+        public ICollection<PriceGapEvent> ClosingPriceGapEvents { get; set; } = new List<PriceGapEvent>();  // For closing side of gap
+        public ICollection<PriceGapEvent> OpeningPriceGapEvents { get; set; } = new List<PriceGapEvent>();  // For opening side of gap
+        public ICollection<PriceGapEvent> FilledGaps { get; set; } = new List<PriceGapEvent>(); // For filled gaps (if any)
+        public ICollection<TradeSetup> TradeSetUps { get; set; } = new List<TradeSetup>();
 
     }
 }

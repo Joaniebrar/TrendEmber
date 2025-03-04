@@ -387,6 +387,112 @@ namespace TrendEmber.Service
             return peaksAndTroughs;
         }
 
+        public async Task DetectGapsAsync()
+        {
+            var symbols = await _dbContext.Symbols.ToDictionaryAsync(stat => stat.Symbol);
+            /*foreach (var symbol in symbols)
+            {
+                await DetectGapsForEqutiyAsync(symbol.Value);
+            }*/
+            foreach (var symbol in symbols)
+            {
+                await IdentifyFilledGapsForEquityAsync(symbol.Value);
+            }
+        }
+        public async Task DetectGapsForEqutiyAsync(WatchListSymbol symbol) {
+            var history = await _dbContext.EquityPrices
+                .Where(h => h.Symbol == symbol.Symbol)
+                .OrderBy(h => h.PriceDate)
+                .ToListAsync();
+
+            var gaps = new List<PriceGapEvent>();
+
+            for (int i = 1; i < history.Count; i++)
+            {
+                var prev = history[i - 1];
+                var curr = history[i];
+
+                // Apply 2% gap threshold (both up and down)
+                if (curr.Open > prev.Close * 1.02m) // 2% up gap
+                {
+                    gaps.Add(new PriceGapEvent
+                    {
+                        Id = Guid.NewGuid(),
+                        ClosingEquityPriceHistoryId = prev.Id,
+                        OpeningEquityPriceHistoryId = curr.Id,
+                        Direction = GapDirection.GapUp,
+                        GapFilledPriceHistoryId = null 
+                    });
+                }
+                else if (curr.Open < prev.Close * 0.98m) // 2% down gap
+                {
+                    gaps.Add(new PriceGapEvent
+                    {
+                        Id = Guid.NewGuid(),
+                        ClosingEquityPriceHistoryId = prev.Id,
+                        OpeningEquityPriceHistoryId = curr.Id,
+                        Direction = GapDirection.GapDown,
+                        GapFilledPriceHistoryId = null // Not filled yet
+                    });
+                }
+            }
+
+            await _dbContext.PriceGapEvents.AddRangeAsync(gaps);
+            await _dbContext.SaveChangesAsync();
+
+        }
+
+        public async Task IdentifyFilledGapsForEquityAsync(WatchListSymbol symbol)
+        {
+            // First, fetch the gaps where GapFilledPriceHistoryId is null
+            var gaps = await _dbContext.PriceGapEvents
+                .Where(g => g.GapFilledPriceHistoryId == null)
+                .Include(g => g.OpeningPriceHistory)  // Include related OpeningPriceHistory
+                .ToListAsync();
+
+            // Fetch all subsequent prices for the given symbol in one go, ordered by PriceDate
+            var subsequentPrices = await _dbContext.EquityPrices
+                .Where(h => h.Symbol == symbol.Symbol)
+                .OrderBy(h => h.PriceDate)
+                .ToListAsync();
+
+            // Iterate over the gaps
+            foreach (var gap in gaps)
+            {
+                // Get subsequent prices that occur after the opening price of the gap
+                var subsequentPriceEntries = subsequentPrices
+                    .Where(h => h.PriceDate > gap.OpeningPriceHistory.PriceDate)
+                    .ToList();
+
+                // Now, you can apply your logic to check if the gap is filled
+                foreach (var price in subsequentPriceEntries)
+                {
+                    if (gap.Direction == GapDirection.GapUp && price.Close >= gap.OpeningPriceHistory.Close * 1.02m) // Example: Gap filled when price closes 2% above
+                    {
+                        gap.GapFilledPriceHistoryId = price.Id;
+
+                        // Optionally save the changes if required, or do it in bulk after processing all gaps
+                        // await _dbContext.SaveChangesAsync(); // This could be done in batches after processing all gaps
+                        break; // Stop iterating once the gap is filled
+                    }
+                    else if (gap.Direction == GapDirection.GapDown && price.Close <= gap.OpeningPriceHistory.Close * 0.98m) // Example: Gap filled when price closes 2% below
+                    {
+                        // Similar logic for filling a downward gap
+                        gap.GapFilledPriceHistoryId = price.Id;
+                        break; // Stop iterating once the gap is filled
+                    }
+                }
+            }
+
+            // Save all changes at once (after processing all gaps)
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DetectTradeSetups() { 
+        
+        }
+
+
 
     }
 
