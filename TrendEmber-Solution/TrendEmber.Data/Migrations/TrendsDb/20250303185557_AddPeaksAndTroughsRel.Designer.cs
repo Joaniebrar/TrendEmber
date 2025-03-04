@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TrendEmber.Data;
@@ -11,9 +12,11 @@ using TrendEmber.Data;
 namespace TrendEmber.Data.Migrations.TrendsDb
 {
     [DbContext(typeof(TrendsDbContext))]
-    partial class TrendsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250303185557_AddPeaksAndTroughsRel")]
+    partial class AddPeaksAndTroughsRel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,9 +246,6 @@ namespace TrendEmber.Data.Migrations.TrendsDb
                     b.Property<DateTime>("PriceDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("PriceHistoryId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("SymbolId")
                         .HasColumnType("uuid");
 
@@ -253,8 +253,6 @@ namespace TrendEmber.Data.Migrations.TrendsDb
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PriceHistoryId");
 
                     b.HasIndex("SymbolId");
 
@@ -306,19 +304,11 @@ namespace TrendEmber.Data.Migrations.TrendsDb
 
             modelBuilder.Entity("TrendEmber.Core.Trends.WavePoint", b =>
                 {
-                    b.HasOne("TrendEmber.Core.Trends.EquityPriceHistory", "PriceHistory")
-                        .WithMany("WavePoints")
-                        .HasForeignKey("PriceHistoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("TrendEmber.Core.Trends.WatchListSymbol", "Symbol")
                         .WithMany("WavePoints")
                         .HasForeignKey("SymbolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("PriceHistory");
 
                     b.Navigation("Symbol");
                 });
@@ -326,11 +316,6 @@ namespace TrendEmber.Data.Migrations.TrendsDb
             modelBuilder.Entity("TrendEmber.Core.Trends.ApiProvider", b =>
                 {
                     b.Navigation("Agents");
-                });
-
-            modelBuilder.Entity("TrendEmber.Core.Trends.EquityPriceHistory", b =>
-                {
-                    b.Navigation("WavePoints");
                 });
 
             modelBuilder.Entity("TrendEmber.Core.Trends.HarvesterAgent", b =>

@@ -12,5 +12,6 @@ namespace TrendEmber.Core.Trends
         public DateTime? LastImportedDate { get; set; }
         public double? MeanRange { get; set; }
         public double? StandardDeviation { get; set; }
+        public ICollection<WavePoint> WavePoints { get; set; } = new List<WavePoint>();
     }
 }

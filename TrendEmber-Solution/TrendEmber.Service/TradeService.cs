@@ -345,6 +345,49 @@ namespace TrendEmber.Service
             _dbContext.SaveChanges();
         }
 
+        public async Task FindPeaksAndTroughsForWatchListAsync()
+        {
+            var symbols = _dbContext.Symbols.ToDictionary(stat => stat.Symbol);
+            foreach (var symbol in symbols)
+            {
+                var prices = await _dbContext.EquityPrices
+                    .Where(x => x.Symbol.Equals(symbol.Value.Symbol)).OrderBy(x => x.PriceDate).ToListAsync();
+                var waves = await FindPeaksAndTroughs(prices, symbol.Value.Id);
+                await _dbContext.WavePoints.AddRangeAsync(waves);
+                await _dbContext.SaveChangesAsync();
+            }
+
+        }
+        public async Task<List<WavePoint>> FindPeaksAndTroughs(List<EquityPriceHistory> prices, Guid symbolId, int lookback = 2)
+        {
+            var peaksAndTroughs = new List<WavePoint>();
+
+            for (int i = lookback; i < prices.Count - lookback; i++)
+            {
+                decimal currentHigh = prices[i].High;
+                decimal currentLow = prices[i].Low;
+
+                bool isPeak = prices.Skip(i - lookback).Take(lookback * 2 + 1)
+                    .All(p => p.High <= currentHigh);
+
+                bool isTrough = prices.Skip(i - lookback).Take(lookback * 2 + 1)
+                    .All(p => p.Low >= currentLow);
+
+                if (isPeak)
+                    peaksAndTroughs.Add(new WavePoint { SymbolId = symbolId, PriceDate = prices[i].PriceDate, Type  = WaveType.Peak, 
+                        Price = currentHigh, PriceHistoryId = prices[i].Id
+                    });
+
+                if (isTrough)
+                    peaksAndTroughs.Add(new WavePoint { SymbolId = symbolId, PriceDate = prices[i].PriceDate, Type = WaveType.Trough, 
+                            Price = currentLow, PriceHistoryId  = prices[i].Id
+                    });
+            }
+
+            return peaksAndTroughs;
+        }
+
+
     }
 
 }

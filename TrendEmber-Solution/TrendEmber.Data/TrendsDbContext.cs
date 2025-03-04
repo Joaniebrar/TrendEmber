@@ -19,6 +19,7 @@ namespace TrendEmber.Data
         public DbSet<HarvesterAgent> Agents { get; set; }
         public DbSet<ApiProvider> ApiProviders { get; set; }
         public DbSet<EquityPriceHistory> EquityPrices { get; set; }
+        public DbSet<WavePoint> WavePoints { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,6 +51,18 @@ namespace TrendEmber.Data
             modelBuilder.Entity<EquityPriceHistory>()
                 .HasIndex(e => new { e.Symbol, e.PriceDate })
                 .HasDatabaseName("IX_Symbol_PriceDate");
+
+            modelBuilder.Entity<WavePoint>()
+                .HasOne(wp => wp.Symbol)
+                .WithMany(sym => sym.WavePoints)
+                .HasForeignKey(wp => wp.SymbolId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WavePoint>()
+                .HasOne(wp => wp.PriceHistory)
+                .WithMany(sym => sym.WavePoints)
+                .HasForeignKey(wp => wp.PriceHistoryId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
       
     }
