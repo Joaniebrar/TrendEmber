@@ -21,6 +21,8 @@ namespace TrendEmber.Data
         public DbSet<EquityPriceHistory> EquityPrices { get; set; }
         public DbSet<WavePoint> WavePoints { get; set; }
 
+        public DbSet<PriceGapEvent> PriceGapEvents { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Trade>()
@@ -63,6 +65,28 @@ namespace TrendEmber.Data
                 .WithMany(sym => sym.WavePoints)
                 .HasForeignKey(wp => wp.PriceHistoryId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+
+            // Define the relationship between PriceGapEvent and EquityPriceHistory for ClosingEquityPriceHistoryId
+            modelBuilder.Entity<PriceGapEvent>()
+                .HasOne(p => p.ClosingPriceHistory)
+                .WithMany(e => e.ClosingPriceGapEvents)
+                .HasForeignKey(p => p.ClosingEquityPriceHistoryId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete if needed
+
+            // Define the relationship between PriceGapEvent and EquityPriceHistory for OpeningEquityPriceHistoryId
+            modelBuilder.Entity<PriceGapEvent>()
+                .HasOne(p => p.OpeningPriceHistory)
+                .WithMany(e => e.OpeningPriceGapEvents)
+                .HasForeignKey(p => p.OpeningEquityPriceHistoryId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete if needed
+
+            // Define the relationship between PriceGapEvent and EquityPriceHistory for GapFilledPriceHistoryId
+            modelBuilder.Entity<PriceGapEvent>()
+                .HasOne(p => p.GapFilledPriceHistory)
+                .WithMany(e => e.FilledGaps)
+                .HasForeignKey(p => p.GapFilledPriceHistoryId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
       
     }

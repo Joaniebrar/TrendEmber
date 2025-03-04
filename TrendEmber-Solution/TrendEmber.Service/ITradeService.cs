@@ -14,7 +14,7 @@ namespace TrendEmber.Service
         public void CalculateMeanAndStandardDeviation();
         public void CalculatePriceHistoryShapeZScore();
         public Task FindPeaksAndTroughsForWatchListAsync();
-
-
+        public Task DetectGapsAsync();
+        public Task DetectTradeSetups();
     }
 }
