@@ -13,6 +13,7 @@ namespace TrendEmber.Service
         public Task RunAgentForWatchlist(Guid watchListId);
         public void CalculateMeanAndStandardDeviation();
         public void CalculatePriceHistoryShapeZScore();
+        public Task FindPeaksAndTroughsForWatchListAsync();
 
 
     }

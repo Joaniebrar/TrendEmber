@@ -132,11 +132,16 @@ using (var scope = app.Services.CreateScope())
         }
     }).Wait();
 
-    var trendsDbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
-    trendsDbContext.Database.Migrate();
-    var tradeService = scope.ServiceProvider.GetRequiredService<ITradeService>();
-    tradeService.CalculateMeanAndStandardDeviation();
-    tradeService.CalculatePriceHistoryShapeZScore();
+
+    //tradeService.CalculateMeanAndStandardDeviation();
+    //tradeService.CalculatePriceHistoryShapeZScore();
+    Task.Run(async () =>
+    {
+        var trendsDbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+        trendsDbContext.Database.Migrate();
+        var tradeService = scope.ServiceProvider.GetRequiredService<ITradeService>();
+        await tradeService.FindPeaksAndTroughsForWatchListAsync();
+    }).Wait();
 
 }
 
