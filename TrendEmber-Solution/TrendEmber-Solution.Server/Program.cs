@@ -141,7 +141,7 @@ using (var scope = app.Services.CreateScope())
         trendsDbContext.Database.Migrate();
         var tradeService = scope.ServiceProvider.GetRequiredService<ITradeService>();
         //await tradeService.FindPeaksAndTroughsForWatchListAsync();
-        //await tradeService.DetectGapsAsync();
+        await tradeService.DetectTradeSetups();
     }).Wait();
 
 }
