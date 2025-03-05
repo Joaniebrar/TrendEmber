@@ -22,6 +22,7 @@ namespace TrendEmber.Data
         public DbSet<WavePoint> WavePoints { get; set; }
 
         public DbSet<PriceGapEvent> PriceGapEvents { get; set; }
+        public DbSet<TradeSetup> TradeSetups { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -87,6 +88,12 @@ namespace TrendEmber.Data
                 .WithMany(e => e.FilledGaps)
                 .HasForeignKey(p => p.GapFilledPriceHistoryId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<TradeSetup>()
+                .HasOne(ts => ts.PriceHistory)
+                .WithMany(ph => ph.TradeSetUps)
+                .HasForeignKey(ts => ts.PriceHistoryId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
       
     }

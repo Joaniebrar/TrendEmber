@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace TrendEmber.Core.Trends
 {
     public enum TradeType { 
@@ -17,6 +12,9 @@ namespace TrendEmber.Core.Trends
     {
         public Guid Id { get; set; }
         public Guid PriceHistoryId { get; set; }
+
+        public TradeType TradeType { get; set; }
         public EquityPriceHistory PriceHistory { get; set; }
+        
     }
 }
