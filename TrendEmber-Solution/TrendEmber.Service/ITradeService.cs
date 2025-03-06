@@ -19,5 +19,7 @@ namespace TrendEmber.Service
         public Task SimulateTrades();
         public Task CalculateSimulationResults();
         public Task CalculateExits();
+
+        public Task RunWeeklyImport();
     }
 }

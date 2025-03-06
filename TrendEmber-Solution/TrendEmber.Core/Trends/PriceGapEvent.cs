@@ -5,8 +5,11 @@ namespace TrendEmber.Core.Trends
     public class PriceGapEvent
     {
         public Guid Id { get; set; }
+        public string Symbol { get; set; }
         public Guid ClosingEquityPriceHistoryId { get; set; }
         public Guid OpeningEquityPriceHistoryId { get; set; }
+        public decimal Open { get; set; }
+        public decimal Close { get; set; }
         public GapDirection Direction { get; set; }
         public Guid? GapFilledPriceHistoryId { get; set; } // Nullable, only set when the gap is filled
 
