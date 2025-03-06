@@ -16,5 +16,8 @@ namespace TrendEmber.Service
         public Task FindPeaksAndTroughsForWatchListAsync();
         public Task DetectGapsAsync();
         public Task DetectTradeSetups();
+        public Task SimulateTrades();
+        public Task CalculateSimulationResults();
+        public Task CalculateExits();
     }
 }
