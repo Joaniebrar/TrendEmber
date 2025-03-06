@@ -357,7 +357,13 @@ namespace TrendEmber.Service
                 var prices = await _dbContext.EquityPrices
                     .Where(x => x.Symbol.Equals(symbol.Value.Symbol)).OrderBy(x => x.PriceDate).ToListAsync();
                 var waves = await FindPeaksAndTroughs(prices, symbol.Value.Id);
-                await _dbContext.WavePoints.AddRangeAsync(waves);
+                foreach (var wave in waves)
+                {
+                    if (!_dbContext.WavePoints.Any(x => x.PriceHistoryId == wave.PriceHistoryId))
+                    {
+                        await _dbContext.WavePoints.AddAsync(wave);
+                    }
+                }
                 await _dbContext.SaveChangesAsync();
             }
 
@@ -404,10 +410,10 @@ namespace TrendEmber.Service
         public async Task DetectGapsAsync()
         {
             var symbols = await _dbContext.Symbols.ToDictionaryAsync(stat => stat.Symbol);
-            /*foreach (var symbol in symbols)
+            foreach (var symbol in symbols)
             {
                 await DetectGapsForEqutiyAsync(symbol.Value);
-            }*/
+            }
             foreach (var symbol in symbols)
             {
                 await IdentifyFilledGapsForEquityAsync(symbol.Value);
@@ -429,14 +435,18 @@ namespace TrendEmber.Service
 
                 // Apply 2% gap threshold (both up and down)
                 if (curr.Open > prev.Close * 1.02m) // 2% up gap
-                {
+                {                    
                     gaps.Add(new PriceGapEvent
                     {
                         Id = Guid.NewGuid(),
                         ClosingEquityPriceHistoryId = prev.Id,
                         OpeningEquityPriceHistoryId = curr.Id,
                         Direction = GapDirection.GapUp,
-                        GapFilledPriceHistoryId = null
+                        GapFilledPriceHistoryId = null,
+                        Symbol = symbol.Symbol,
+                        Close = prev.Close,
+                        Open = curr.Open,
+                        
                     });
                 }
                 else if (curr.Open < prev.Close * 0.98m) // 2% down gap
@@ -447,59 +457,60 @@ namespace TrendEmber.Service
                         ClosingEquityPriceHistoryId = prev.Id,
                         OpeningEquityPriceHistoryId = curr.Id,
                         Direction = GapDirection.GapDown,
-                        GapFilledPriceHistoryId = null // Not filled yet
+                        GapFilledPriceHistoryId = null,
+                        Symbol = symbol.Symbol,
+                        Close = prev.Close,
+                        Open = curr.Open,
                     });
                 }
             }
 
-            await _dbContext.PriceGapEvents.AddRangeAsync(gaps);
+            foreach (var gap in gaps)
+            {
+                if (!_dbContext.PriceGapEvents
+                    .Any(x => x.ClosingEquityPriceHistoryId == gap.ClosingEquityPriceHistoryId))
+                {
+                    await _dbContext.PriceGapEvents.AddAsync(gap);
+                }
+            }
             await _dbContext.SaveChangesAsync();
 
         }
 
         public async Task IdentifyFilledGapsForEquityAsync(WatchListSymbol symbol)
         {
-            // First, fetch the gaps where GapFilledPriceHistoryId is null
             var gaps = await _dbContext.PriceGapEvents
                 .Where(g => g.GapFilledPriceHistoryId == null)
-                .Include(g => g.OpeningPriceHistory)  // Include related OpeningPriceHistory
+                .Include(g => g.OpeningPriceHistory)  
                 .ToListAsync();
 
-            // Fetch all subsequent prices for the given symbol in one go, ordered by PriceDate
             var subsequentPrices = await _dbContext.EquityPrices
                 .Where(h => h.Symbol == symbol.Symbol)
                 .OrderBy(h => h.PriceDate)
                 .ToListAsync();
-
-            // Iterate over the gaps
+            
             foreach (var gap in gaps)
             {
-                // Get subsequent prices that occur after the opening price of the gap
                 var subsequentPriceEntries = subsequentPrices
                     .Where(h => h.PriceDate > gap.OpeningPriceHistory.PriceDate)
                     .ToList();
 
-                // Now, you can apply your logic to check if the gap is filled
                 foreach (var price in subsequentPriceEntries)
                 {
-                    if (gap.Direction == GapDirection.GapUp && price.Close >= gap.OpeningPriceHistory.Close * 1.02m) // Example: Gap filled when price closes 2% above
+                    if (gap.Direction == GapDirection.GapUp && price.Close < gap.Open) 
                     {
                         gap.GapFilledPriceHistoryId = price.Id;
 
-                        // Optionally save the changes if required, or do it in bulk after processing all gaps
-                        // await _dbContext.SaveChangesAsync(); // This could be done in batches after processing all gaps
-                        break; // Stop iterating once the gap is filled
+                        break; 
                     }
-                    else if (gap.Direction == GapDirection.GapDown && price.Close <= gap.OpeningPriceHistory.Close * 0.98m) // Example: Gap filled when price closes 2% below
+                    else if (gap.Direction == GapDirection.GapDown && price.Close > gap.Close) 
                     {
-                        // Similar logic for filling a downward gap
                         gap.GapFilledPriceHistoryId = price.Id;
-                        break; // Stop iterating once the gap is filled
+                        break; 
                     }
                 }
             }
-
-            // Save all changes at once (after processing all gaps)
+            
             await _dbContext.SaveChangesAsync();
         }
 
@@ -777,6 +788,86 @@ namespace TrendEmber.Service
                 }
             }
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task RunAgentForWeek(Guid watchListId)
+        {
+            var watchList = await _dbContext
+                    .WatchList
+                    .Include(x => x.Symbols)
+                    .Include(x => x.Agent)
+                        .ThenInclude(a => a.ApiProvider)
+                    .Where(x => x.Id == watchListId)
+                    .FirstAsync();
+            List<DateTime> CallTimestamps = new List<DateTime>();
+
+            foreach (var symbol in
+                        watchList.Symbols.OrderBy(x => x.Symbol))
+            {
+                var httpClient = new HttpClient();
+                var lastRun = symbol.LastImportedDate?.ToString("yyyy-MM-dd") ?? "2022-01-01";
+                if (lastRun == "0001-01-01")
+                    lastRun = "2022-01-01";
+                var thisweek = DateTime.Now.ToString("yyyy-MM-dd");
+                var done = false;
+                try
+                {
+                    var priceHistory = new List<EquityPriceHistory>();
+                    var formattedUrl = string.Format(watchList.Agent.ApiProvider.BaseUrl, symbol.Symbol, lastRun, thisweek, "");
+                    if (CallTimestamps.Count >= 5)
+                    {
+                        Task.Delay(TimeSpan.FromMinutes(1)).Wait();
+                        CallTimestamps.Clear();
+                    }
+                    CallTimestamps.Add(DateTime.UtcNow);
+                    HttpResponseMessage response = await httpClient.GetAsync(formattedUrl);
+                    response.EnsureSuccessStatusCode();
+
+                    string responseData = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<PolyGonIOApiResponse>(responseData);
+                    if (apiResponse.results.Count > 0)
+                    {
+                        thisweek = ConverUnixTimeStampToDateTime(apiResponse.results[0].t).ToString("yyyy-MM-dd");
+                    }
+                    foreach (var item in apiResponse.results)
+                    {
+                        priceHistory.Add(new EquityPriceHistory()
+                        {
+                            Symbol = symbol.Symbol,
+                            Volume = item.v,
+                            VolumeWeighted = item.vw,
+                            Open = item.o,
+                            Close = item.c,
+                            High = item.h,
+                            Low = item.l,
+                            PriceDate = ConverUnixTimeStampToDateTime(item.t),
+                            RawPriceDatee = item.t,
+                            ChartTime = ChartTime.Weekly,
+                        });
+                    }
+                    var rangeToAdd = priceHistory.DistinctBy(x => x.PriceDate).ToList();
+                    await _dbContext.AddRangeAsync(rangeToAdd);
+                    symbol.LastImportedDate = DateTime.UtcNow;
+                    await _dbContext.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                    return;
+                }
+
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task RunWeeklyImport() {
+            //get lastrun
+            //import price histories
+            //FindPeaksAndTroughsForWatchListAsync
+            //CalculatePriceHistoryShapeZScore
+            //DetectGapsAsync
+            //DetectTradeSetups
+            //update lastrun
         }
     }
 
