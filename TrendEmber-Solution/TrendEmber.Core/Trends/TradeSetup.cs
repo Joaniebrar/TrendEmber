@@ -15,6 +15,7 @@ namespace TrendEmber.Core.Trends
 
         public TradeType TradeType { get; set; }
         public EquityPriceHistory PriceHistory { get; set; }
-        
+        public ICollection<TradeSetupSimulation> TradeSetupSimulations { get; set; } = new List<TradeSetupSimulation>();
+
     }
 }

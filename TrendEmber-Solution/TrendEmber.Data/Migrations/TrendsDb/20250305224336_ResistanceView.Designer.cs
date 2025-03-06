@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TrendEmber.Data;
@@ -11,9 +12,11 @@ using TrendEmber.Data;
 namespace TrendEmber.Data.Migrations.TrendsDb
 {
     [DbContext(typeof(TrendsDbContext))]
-    partial class TrendsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250305224336_ResistanceView")]
+    partial class ResistanceView
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -140,26 +143,6 @@ namespace TrendEmber.Data.Migrations.TrendsDb
                     b.ToTable("PriceGapEvents");
                 });
 
-            modelBuilder.Entity("TrendEmber.Core.Trends.ResistancePoints", b =>
-                {
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal?>("Resistance")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Symbol")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("ResistancePointsView", (string)null);
-                });
-
             modelBuilder.Entity("TrendEmber.Core.Trends.Trade", b =>
                 {
                     b.Property<Guid>("Id")
@@ -236,75 +219,6 @@ namespace TrendEmber.Data.Migrations.TrendsDb
                     b.HasIndex("PriceHistoryId");
 
                     b.ToTable("TradeSetups");
-                });
-
-            modelBuilder.Entity("TrendEmber.Core.Trends.TradeSetupSimulation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal?>("Entry")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("Exit")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("ExitDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal?>("ExitPercentage")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("FirstResistance")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("FirstSupport")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("SL")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("SLPercentage")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("SecondResistance")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("SecondSupport")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Symbol")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal?>("TG1")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("TG1Percentage")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("TG2")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("TG2Percentage")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("TradeDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("TradeSetupId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Version")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TradeSetupId");
-
-                    b.ToTable("TradeSetupSimulations");
                 });
 
             modelBuilder.Entity("TrendEmber.Core.Trends.WatchList", b =>
@@ -457,17 +371,6 @@ namespace TrendEmber.Data.Migrations.TrendsDb
                     b.Navigation("PriceHistory");
                 });
 
-            modelBuilder.Entity("TrendEmber.Core.Trends.TradeSetupSimulation", b =>
-                {
-                    b.HasOne("TrendEmber.Core.Trends.TradeSetup", "TradeSetup")
-                        .WithMany("TradeSetupSimulations")
-                        .HasForeignKey("TradeSetupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TradeSetup");
-                });
-
             modelBuilder.Entity("TrendEmber.Core.Trends.WatchList", b =>
                 {
                     b.HasOne("TrendEmber.Core.Trends.HarvesterAgent", "Agent")
@@ -535,11 +438,6 @@ namespace TrendEmber.Data.Migrations.TrendsDb
             modelBuilder.Entity("TrendEmber.Core.Trends.TradeSet", b =>
                 {
                     b.Navigation("Trades");
-                });
-
-            modelBuilder.Entity("TrendEmber.Core.Trends.TradeSetup", b =>
-                {
-                    b.Navigation("TradeSetupSimulations");
                 });
 
             modelBuilder.Entity("TrendEmber.Core.Trends.WatchList", b =>

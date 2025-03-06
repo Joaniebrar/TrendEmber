@@ -24,6 +24,10 @@ namespace TrendEmber.Data
         public DbSet<PriceGapEvent> PriceGapEvents { get; set; }
         public DbSet<TradeSetup> TradeSetups { get; set; }
 
+        public DbSet<ResistancePoints> ResistancePoints { get; set; }
+
+        public DbSet<TradeSetupSimulation> TradeSetupSimulations { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Trade>()
@@ -93,6 +97,15 @@ namespace TrendEmber.Data
                 .HasOne(ts => ts.PriceHistory)
                 .WithMany(ph => ph.TradeSetUps)
                 .HasForeignKey(ts => ts.PriceHistoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ResistancePoints>().HasNoKey();
+            modelBuilder.Entity<ResistancePoints>().ToView("ResistancePointsView");
+
+            modelBuilder.Entity<TradeSetupSimulation>()
+                .HasOne(tss => tss.TradeSetup)
+                .WithMany(ts => ts.TradeSetupSimulations)
+                .HasForeignKey(tss => tss.TradeSetupId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
       

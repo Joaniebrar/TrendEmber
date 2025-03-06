@@ -19,19 +19,20 @@ namespace TrendEmber.Service
     public class TradeService : ITradeService
     {
         private TrendsDbContext _dbContext;
-        public TradeService(TrendsDbContext trendsDbContext) { 
+        public TradeService(TrendsDbContext trendsDbContext)
+        {
             _dbContext = trendsDbContext;
         }
-        public async Task<(IEnumerable<TradeSet>, string? nextCursor)> GetTradeSetsAsync(string? cursor, int pageSize) 
+        public async Task<(IEnumerable<TradeSet>, string? nextCursor)> GetTradeSetsAsync(string? cursor, int pageSize)
         {
-            var query = _dbContext.TradeSets.Include(q=>q.Trades).OrderByDescending(ts => ts.ImportedDate).AsQueryable();
+            var query = _dbContext.TradeSets.Include(q => q.Trades).OrderByDescending(ts => ts.ImportedDate).AsQueryable();
 
             if (!string.IsNullOrEmpty(cursor) && DateTime.TryParse(cursor, out var lastDate))
             {
                 query = query.Where(ts => ts.ImportedDate < lastDate.ToUniversalTime());
             }
 
-            var tradeSets =  await query.Take(pageSize).ToListAsync();
+            var tradeSets = await query.Take(pageSize).ToListAsync();
             var nextCursor = tradeSets.Any() ? tradeSets.Last().ImportedDate.ToString("O") : null;
             return (tradeSets, nextCursor);
         }
@@ -133,17 +134,17 @@ namespace TrendEmber.Service
 
                 await _dbContext.SaveChangesAsync();
 
-                return new Result<object>(true,"Trades imported successfully",tradeSet);
+                return new Result<object>(true, "Trades imported successfully", tradeSet);
             }
             catch (Exception ex)
-            {                
+            {
                 return new Result<object>(false, $"Error importing trades: {ex.Message}", name);
             }
         }
 
         public async Task<(IEnumerable<WatchList>, string? nextCursor)> GetWatchListsAsync(string? cursor, int pageSize)
         {
-            var query = _dbContext.WatchList.Include(x=>x.Agent).Include(q => q.Symbols).OrderByDescending(ts => ts.ImportedDate).AsQueryable();
+            var query = _dbContext.WatchList.Include(x => x.Agent).Include(q => q.Symbols).OrderByDescending(ts => ts.ImportedDate).AsQueryable();
 
             if (!string.IsNullOrEmpty(cursor) && DateTime.TryParse(cursor, out var lastDate))
             {
@@ -155,9 +156,10 @@ namespace TrendEmber.Service
             return (watchLists, nextCursor);
         }
 
-        public async Task<IEnumerable<WatchListSymbol>> GetWatchListSymbolsAsync(Guid watchListId) {
+        public async Task<IEnumerable<WatchListSymbol>> GetWatchListSymbolsAsync(Guid watchListId)
+        {
             var query = _dbContext.Symbols.Where(x => x.WatchListId == watchListId).AsQueryable();
-            return await query.ToListAsync();            
+            return await query.ToListAsync();
         }
 
         public async Task<Result<object>> ImportWatchListAsync(string? file, string name, string mapping, bool ignoreFirstRow)
@@ -207,7 +209,7 @@ namespace TrendEmber.Service
                         }
 
                         var watchListSymbol = importedSymbol.GetValueOrDefault("Symbol")?.Split(":");
-                        if (watchListSymbol?.Length==2)
+                        if (watchListSymbol?.Length == 2)
                         {
                             var symbolToAdd = new WatchListSymbol
                             {
@@ -235,17 +237,17 @@ namespace TrendEmber.Service
 
         public async Task RunAgentForWatchlist(Guid watchListId)
         {
-            var watchList= await _dbContext
+            var watchList = await _dbContext
                     .WatchList
                     .Include(x => x.Symbols)
                     .Include(x => x.Agent)
                         .ThenInclude(a => a.ApiProvider)
-                    .Where(x=>x.Id == watchListId)
+                    .Where(x => x.Id == watchListId)
                     .FirstAsync();
             List<DateTime> CallTimestamps = new List<DateTime>();
-            
-            foreach (var symbol in 
-                        watchList.Symbols.OrderBy(x=>x.Symbol))
+
+            foreach (var symbol in
+                        watchList.Symbols.OrderBy(x => x.Symbol))
             {
                 var httpClient = new HttpClient();
                 var lastRun = symbol.LastImportedDate?.ToString("yyyy-MM-dd") ?? "2022-01-01";
@@ -288,7 +290,7 @@ namespace TrendEmber.Service
                             ChartTime = ChartTime.Weekly,
                         });
                     }
-                    var rangeToAdd = priceHistory.DistinctBy(x=>x.PriceDate).ToList();
+                    var rangeToAdd = priceHistory.DistinctBy(x => x.PriceDate).ToList();
                     await _dbContext.AddRangeAsync(rangeToAdd);
                     symbol.LastImportedDate = DateTime.UtcNow;
                     await _dbContext.SaveChangesAsync();
@@ -305,8 +307,8 @@ namespace TrendEmber.Service
 
         public void CalculateMeanAndStandardDeviation()
         {
-            var calculatedResults=_dbContext.EquityPrices
-                .AsEnumerable() 
+            var calculatedResults = _dbContext.EquityPrices
+                .AsEnumerable()
                 .GroupBy(e => e.Symbol)
                 .Select(g =>
                 {
@@ -322,7 +324,8 @@ namespace TrendEmber.Service
                     };
                 })
                 .ToDictionary(stat => stat.Symbol);
-            foreach (var symbol in _dbContext.Symbols) {
+            foreach (var symbol in _dbContext.Symbols)
+            {
                 var symbolStats = calculatedResults[symbol.Symbol];
                 symbol.MeanRange = symbolStats.Mean;
                 symbol.StandardDeviation = symbolStats.StandardDeviation;
@@ -335,7 +338,7 @@ namespace TrendEmber.Service
             var symbols = _dbContext.Symbols.ToDictionary(stat => stat.Symbol);
             foreach (var priceEvent in _dbContext.EquityPrices)
             {
-               var symbol= symbols[priceEvent.Symbol];
+                var symbol = symbols[priceEvent.Symbol];
                 if (symbol.MeanRange.HasValue && symbol.StandardDeviation.HasValue)
                 {
                     priceEvent.RangeZScore = CandleStickAnalyzer.CalculateZScore(priceEvent.High, priceEvent.Low, symbol.MeanRange.Value, symbol.StandardDeviation.Value);
@@ -375,13 +378,23 @@ namespace TrendEmber.Service
                     .All(p => p.Low >= currentLow);
 
                 if (isPeak)
-                    peaksAndTroughs.Add(new WavePoint { SymbolId = symbolId, PriceDate = prices[i].PriceDate, Type  = WaveType.Peak, 
-                        Price = currentHigh, PriceHistoryId = prices[i].Id
+                    peaksAndTroughs.Add(new WavePoint
+                    {
+                        SymbolId = symbolId,
+                        PriceDate = prices[i].PriceDate,
+                        Type = WaveType.Peak,
+                        Price = currentHigh,
+                        PriceHistoryId = prices[i].Id
                     });
 
                 if (isTrough)
-                    peaksAndTroughs.Add(new WavePoint { SymbolId = symbolId, PriceDate = prices[i].PriceDate, Type = WaveType.Trough, 
-                            Price = currentLow, PriceHistoryId  = prices[i].Id
+                    peaksAndTroughs.Add(new WavePoint
+                    {
+                        SymbolId = symbolId,
+                        PriceDate = prices[i].PriceDate,
+                        Type = WaveType.Trough,
+                        Price = currentLow,
+                        PriceHistoryId = prices[i].Id
                     });
             }
 
@@ -400,7 +413,8 @@ namespace TrendEmber.Service
                 await IdentifyFilledGapsForEquityAsync(symbol.Value);
             }
         }
-        public async Task DetectGapsForEqutiyAsync(WatchListSymbol symbol) {
+        public async Task DetectGapsForEqutiyAsync(WatchListSymbol symbol)
+        {
             var history = await _dbContext.EquityPrices
                 .Where(h => h.Symbol == symbol.Symbol)
                 .OrderBy(h => h.PriceDate)
@@ -422,7 +436,7 @@ namespace TrendEmber.Service
                         ClosingEquityPriceHistoryId = prev.Id,
                         OpeningEquityPriceHistoryId = curr.Id,
                         Direction = GapDirection.GapUp,
-                        GapFilledPriceHistoryId = null 
+                        GapFilledPriceHistoryId = null
                     });
                 }
                 else if (curr.Open < prev.Close * 0.98m) // 2% down gap
@@ -489,7 +503,8 @@ namespace TrendEmber.Service
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DetectTradeSetups() {
+        public async Task DetectTradeSetups()
+        {
             var symbols = _dbContext.Symbols.ToDictionary(stat => stat.Symbol);
             foreach (var symbol in symbols)
             {
@@ -514,6 +529,7 @@ namespace TrendEmber.Service
 
                 // Setup 1: FullBar with Z-Score between 1.5 and 5, followed by Hammer or Doji
                 if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= 1.5 and <= 5 &&
+                    prev.Open > prev.Close &&
                     (curr.Shape == CandleShape.Hammer || curr.Shape == CandleShape.Doji))
                 {
                     tradeSetups.Add(new TradeSetup
@@ -527,7 +543,7 @@ namespace TrendEmber.Service
 
                 // Setup 2: FullBar with Z-Score between -0.5 and 1.4, prev closes lower, curr closes higher
                 if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= -0.5 and <= 1.4 && prev.Close < prev.Open &&
-                    curr.Shape == CandleShape.FullBar && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > curr.Open)
+                    (curr.Shape == CandleShape.FullBar || curr.Shape == CandleShape.TailBar) && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > curr.Open)
                 {
                     tradeSetups.Add(new TradeSetup
                     {
@@ -606,7 +622,162 @@ namespace TrendEmber.Service
 
 
 
+        public async Task SimulateTrades()
+        {
+            var symbols = _dbContext.Symbols.ToDictionary(stat => stat.Symbol);
+            foreach (var symbol in symbols)
+            {
+                var tradeSetups = _dbContext.TradeSetups.Include(x => x.PriceHistory)
+                        .Where(x => x.PriceHistory.Symbol == symbol.Value.Symbol)
+                        .OrderBy(x => x.PriceHistory.PriceDate).ToList();
+                var resistancePoints = _dbContext.ResistancePoints
+                        .Where(x => x.Symbol == symbol.Value.Symbol).ToList();
+                foreach (var setup in tradeSetups)
+                {
 
+                    var tradeSimulation = new TradeSetupSimulation();
+                    tradeSimulation.Symbol = symbol.Value.Symbol;
+                    tradeSimulation.Version = "v1";
+                    tradeSimulation.TradeSetupId = setup.Id;
+                    tradeSimulation.Entry = setup.PriceHistory.Close;
+                    tradeSimulation.TradeDate = setup.PriceHistory.PriceDate;
+
+                    var nearestResistances = resistancePoints
+                        .Where(rp => rp.Resistance.HasValue
+                                     && rp.Resistance.Value > tradeSimulation.Entry
+                                     && rp.StartDate <= tradeSimulation.TradeDate
+                                     && (!rp.EndDate.HasValue || rp.EndDate > tradeSimulation.TradeDate))
+                        .OrderBy(rp => rp.Resistance)
+                        .Take(2)
+                        .ToList();
+                    var nearestSupport = resistancePoints
+                        .Where(rp => rp.Resistance.HasValue
+                                     && rp.Resistance.Value < tradeSimulation.Entry
+                                     && rp.StartDate <= tradeSimulation.TradeDate
+                                     && (!rp.EndDate.HasValue || rp.EndDate > tradeSimulation.TradeDate))
+                        .OrderBy(rp => rp.Resistance)
+                        .Take(2)
+                        .ToList();
+                    tradeSimulation.FirstResistance = nearestResistances.ElementAtOrDefault(0)?.Resistance;
+                    tradeSimulation.SecondResistance = nearestResistances.ElementAtOrDefault(1)?.Resistance;
+                    tradeSimulation.FirstSupport = nearestSupport.ElementAtOrDefault(0)?.Resistance;
+                    tradeSimulation.SecondSupport = nearestSupport.ElementAtOrDefault(1)?.Resistance;
+                    await _dbContext.AddAsync(tradeSimulation);
+                }
+            }
+            await _dbContext.SaveChangesAsync();
+
+        }
+
+        public static decimal CalculateProportionalZ(decimal x, decimal y)
+        {
+            decimal percentageIncrease = (y - x) / x;
+            decimal z = y + (percentageIncrease * y);
+            return z;
+        }
+
+        public async Task CalculateSimulationResultsV2()
+        {
+            foreach (var simulation in _dbContext.TradeSetupSimulations)
+            {
+                if (simulation.FirstResistance >= simulation.Entry * 1.065m)
+                {
+                    simulation.Version = "v2";
+                    simulation.TG1 = simulation.FirstResistance;
+                    simulation.TG2 = simulation.SecondResistance.HasValue ? simulation.SecondResistance : simulation.FirstResistance*1.05m;
+                    simulation.TG1Percentage = ((simulation.TG1 - simulation.Entry) / simulation.Entry) * 100;
+                    simulation.TG2Percentage = ((simulation.TG2 - simulation.Entry) / simulation.Entry) * 100;
+                    var declinePercentage = ((simulation.TG1 - simulation.Entry) / simulation.TG1) * 100;
+                    simulation.SL = decimal.Max(simulation.Entry.Value * (1 - (declinePercentage.Value / 100)),
+                            simulation.FirstSupport.HasValue ? simulation.FirstSupport.Value : decimal.MinValue);
+                    simulation.SLPercentage = ((simulation.Entry - simulation.SL) / simulation.Entry) * 100;
+
+                }
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task CalculateSimulationResults()
+        {
+            foreach (var simulation in _dbContext.TradeSetupSimulations)
+            {
+                if (simulation.FirstResistance >= simulation.Entry * 1.065m)
+                {
+                    simulation.Version = "v3";
+                    simulation.TG1 = simulation.FirstResistance;
+                    simulation.TG2 = simulation.Entry * (1 + ((simulation.TG1 - simulation.Entry) / simulation.Entry) * 1.10m);
+                    simulation.TG1Percentage = ((simulation.TG1 - simulation.Entry) / simulation.Entry) * 100;
+                    simulation.TG2Percentage = ((simulation.TG2 - simulation.Entry) / simulation.Entry) * 100;
+                    var declinePercentage = ((simulation.TG1 - simulation.Entry) / simulation.TG1) * 100;
+                    simulation.SL = decimal.Max(simulation.Entry.Value * (1 - (declinePercentage.Value / 100)),
+                            simulation.FirstSupport.HasValue ? simulation.FirstSupport.Value : decimal.MinValue);
+                    simulation.SLPercentage = ((simulation.Entry - simulation.SL) / simulation.Entry) * 100;
+
+                }
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<(decimal? SelectedValue, DateTime PriceDate)> GetSelectedValueAndDateAsync(TradeSetupSimulation simulation)
+        {
+            var equityPrices = await _dbContext.EquityPrices.AsNoTracking()
+                .Where(x => x.Symbol == simulation.Symbol && x.PriceDate > simulation.TradeDate)
+                .Select(x => new { x.PriceDate,x.High,x.Low})
+                .OrderBy(x => x.PriceDate)
+                .ToListAsync(); // Retrieve the list of equity prices asynchronously
+
+            var result = equityPrices
+                .Aggregate((Reached: (decimal?)null, FoundTG2: false, PriceDate: (DateTime?)null), (acc, price) =>
+                {
+                    if (price.Low <= simulation.TG2 && price.High >= simulation.TG2 && !acc.FoundTG2)
+                    {
+                        acc.FoundTG2 = true;
+                        acc.Reached = simulation.TG2;
+                        acc.PriceDate = price.PriceDate;
+                    }
+
+                    if (price.Low <= simulation.SL && price.High >= simulation.SL)
+                    {
+                        acc.Reached = simulation.SL;
+                        acc.PriceDate = price.PriceDate;
+                        return acc; // Stop further processing once SL is found
+                    }
+
+                    return acc;
+                });
+
+            var selectedValue = result.Reached ?? simulation.TG2;
+            var selectedPriceDate = result.PriceDate ?? default(DateTime); // Ensure default if PriceDate is null
+
+            return (selectedValue, selectedPriceDate);
+        }
+
+        public async Task<decimal> CalculatePercentageDifferenceAsync(decimal entry, decimal exit)
+        {
+            // Simulate some async work if needed (e.g., data fetching, external calls, etc.)
+            await Task.Delay(100); // This is just for demonstration purposes and can be removed.
+
+            // Calculate the percentage difference
+            decimal percentageDifference = ((exit - entry) / entry) * 100;
+
+            return percentageDifference;
+        }
+
+
+        public async Task CalculateExits()
+        {
+            foreach (var simulation in _dbContext.TradeSetupSimulations.ToList())
+            {
+                if (simulation.Version == "v3")
+                {
+                    var result = await GetSelectedValueAndDateAsync(simulation);
+                    simulation.Exit = result.SelectedValue;
+                    simulation.ExitDate = result.PriceDate;
+                    simulation.ExitPercentage = await CalculatePercentageDifferenceAsync(simulation.Entry.Value, simulation.Exit.Value);
+                }
+            }
+            await _dbContext.SaveChangesAsync();
+        }
     }
 
 }
