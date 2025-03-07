@@ -12,14 +12,12 @@ namespace TrendEmber.Service
         public Task<IEnumerable<WatchListSymbol>> GetWatchListSymbolsAsync(Guid watchListId);
         public Task RunAgentForWatchlist(Guid watchListId);
         public void CalculateMeanAndStandardDeviation();
-        public void CalculatePriceHistoryShapeZScore();
         public Task FindPeaksAndTroughsForWatchListAsync();
         public Task DetectGapsAsync();
-        public Task DetectTradeSetups();
         public Task SimulateTrades();
         public Task CalculateSimulationResults();
         public Task CalculateExits();
 
-        public Task RunWeeklyImport();
+        
     }
 }

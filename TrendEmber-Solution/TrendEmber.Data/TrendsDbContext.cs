@@ -28,6 +28,8 @@ namespace TrendEmber.Data
 
         public DbSet<TradeSetupSimulation> TradeSetupSimulations { get; set; }
 
+        public DbSet<WeeklyImport> WeeklyImports { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Trade>()

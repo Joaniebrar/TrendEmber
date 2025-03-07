@@ -83,6 +83,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ITradeService, TradeService>();
+builder.Services.AddScoped<IWeeklyImportService, WeeklyImportService>();
 
 var app = builder.Build();
 
@@ -140,10 +141,11 @@ using (var scope = app.Services.CreateScope())
         var trendsDbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
         trendsDbContext.Database.Migrate();
         var tradeService = scope.ServiceProvider.GetRequiredService<ITradeService>();
-
-        await tradeService.FindPeaksAndTroughsForWatchListAsync();
-        await tradeService.CalculateSimulationResults();
-        await tradeService.DetectGapsAsync();
+        var weeklyImportService = scope.ServiceProvider.GetRequiredService<IWeeklyImportService>();
+        //await tradeService.FindPeaksAndTroughsForWatchListAsync();
+        //await tradeService.CalculateSimulationResults();
+        //await tradeService.DetectGapsAsync();
+        await weeklyImportService.RunWeeklyImportAsync();
     }).Wait();
 
 }
