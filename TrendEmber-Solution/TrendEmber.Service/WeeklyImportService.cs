@@ -95,114 +95,81 @@ namespace TrendEmber.Service
             return currentDate.AddDays(-daysToSubtract);
         }
 
-        public async Task<List<TradeSetup>> IdentifyTradeSetupsAsync(WatchListSymbol symbol, long priceDate)
+        public async Task<List<TradeSetup>> IdentifyTradeSetupsAsync(WatchListSymbol symbol, long? priceDate)
         {
             var tradeSetups = new List<TradeSetup>();
 
-            var history = await _dbContext.EquityPrices
-                .Where(h => h.Symbol == symbol.Symbol)
-                .OrderBy(h => h.PriceDate)
-                .ToListAsync();
+            // Query equity prices
+            var equityPricesQuery = _dbContext.EquityPrices
+                .Where(h => h.Symbol == symbol.Symbol);
 
-            for (int i = 1; i < history.Count; i++)
+            if (priceDate.HasValue)
             {
-                var prev = history[i - 1];
-                var curr = history[i];
-
-                // Setup 1: FullBar with Z-Score between 1.5 and 5, followed by Hammer or Doji
-                if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= 1.5 and <= 5 &&
-                    prev.Open > prev.Close &&
-                    (curr.Shape == CandleShape.Hammer || curr.Shape == CandleShape.Doji))
-                {
-                    tradeSetups.Add(new TradeSetup
-                    {
-                        Id = Guid.NewGuid(),
-                        PriceHistoryId = curr.Id,
-                        PriceHistory = curr,
-                        TradeType = TradeType.BigBarPause
-                    });
-                }
-
-                // Setup 2: FullBar with Z-Score between -0.5 and 1.4, prev closes lower, curr closes higher
-                if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= -0.5 and <= 1.4 && prev.Close < prev.Open &&
-                    (curr.Shape == CandleShape.FullBar || curr.Shape == CandleShape.TailBar) && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > curr.Open)
-                {
-                    tradeSetups.Add(new TradeSetup
-                    {
-                        Id = Guid.NewGuid(),
-                        PriceHistoryId = curr.Id,
-                        PriceHistory = curr,
-                        TradeType = TradeType.Engulfing
-                    });
-                }
-
-                // Setup 3: Doji or Hammer followed by FullBar closing higher
-                if ((prev.Shape == CandleShape.Doji || prev.Shape == CandleShape.Hammer) &&
-                    prev.RangeZScore is >= -0.5 and <= 1.4 &&
-                    curr.Shape == CandleShape.FullBar && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > prev.Close)
-                {
-                    tradeSetups.Add(new TradeSetup
-                    {
-                        Id = Guid.NewGuid(),
-                        PriceHistoryId = curr.Id,
-                        PriceHistory = curr,
-                        TradeType = TradeType.DojiConfirmed
-                    });
-                }
-
-                // Setup 4: TailBar with Z-Score 1-1.5 and closing lower, followed by FullBar
-                if (prev.Shape == CandleShape.TailBar && prev.RangeZScore is >= 1.0 and <= 1.5 && prev.Close < prev.Open &&
-                    curr.Shape == CandleShape.FullBar && curr.RangeZScore is >= -0.5 and <= 1.4 &&
-                    curr.Open < prev.Close && curr.Close >= prev.Low)
-                {
-                    tradeSetups.Add(new TradeSetup
-                    {
-                        Id = Guid.NewGuid(),
-                        PriceHistoryId = curr.Id,
-                        PriceHistory = curr,
-                        TradeType = TradeType.ContainedTailBar
-                    });
-                }
+                equityPricesQuery = equityPricesQuery.Where(h => h.RawPriceDatee == priceDate.Value);
             }
 
-            // Setup 5: Three TailBars, Dojis, or Hammers between two wavepoints
+            var equityPrices = await equityPricesQuery
+                .OrderBy(h => h.PriceDate)
+                .AsNoTracking()
+                .ToListAsync();
+
+            // Query wave points and use AsEnumerable() to process incrementally
             var wavePoints = await _dbContext.WavePoints
                 .Where(w => w.PriceHistory.Symbol == symbol.Symbol)
                 .OrderBy(w => w.PriceHistory.PriceDate)
+                .AsNoTracking()
                 .ToListAsync();
 
-            for (int i = 1; i < wavePoints.Count; i++)
+            // Dictionary for fast lookup of equity prices by date
+            var equityPriceDict = equityPrices.ToDictionary(ep => ep.PriceDate);
+
+            int waveIndex = 0;
+            for (var i = 0; i < equityPrices.Count; i++)
             {
-                var startWave = wavePoints[i - 1];
-                var endWave = wavePoints[i];
+                var currentPrice = equityPrices[i];
 
-                var barsBetween = history.Where(h => h.PriceDate > startWave.PriceHistory.PriceDate &&
-                                                     h.PriceDate < endWave.PriceHistory.PriceDate)
-                                         .ToList();
-
-                var qualifyingBars = barsBetween.Where(h =>
-                    (h.Shape == CandleShape.TailBar || h.Shape == CandleShape.Doji || h.Shape == CandleShape.Hammer) &&
-                    h.RangeZScore > 1.3 && h.Low < history[history.IndexOf(h) - 1].Low).ToList();
-
-                if (qualifyingBars.Count >= 3)
+                // Efficiently find the last wave point using a moving index (O(N))
+                while (waveIndex < wavePoints.Count && wavePoints[waveIndex].PriceDate <= currentPrice.PriceDate)
                 {
-                    tradeSetups.Add(new TradeSetup
+                    waveIndex++;
+                }
+                var lastWavePoint = waveIndex > 0 ? wavePoints[waveIndex - 1] : null;
+
+                List<EquityPriceHistory> pricesBetween;
+
+                if (lastWavePoint != null)
+                {
+                    pricesBetween = equityPrices
+                        .Skip(i) // Start from the current price
+                        .TakeWhile(ep => ep.PriceDate <= currentPrice.PriceDate)
+                        .ToList();
+                }
+                else
+                {
+                    pricesBetween = new List<EquityPriceHistory> { currentPrice };
+                    if (i > 0)
                     {
-                        Id = Guid.NewGuid(),
-                        PriceHistoryId = qualifyingBars.Last().Id,
-                        PriceHistory = qualifyingBars.Last(),
-                        TradeType = TradeType.ThreeTails
-                    });
+                        pricesBetween.Insert(0, equityPrices[i - 1]); // Add previous price if exists
+                    }
+                }
+
+                // Analyze trade setup
+                var tradeSetup = TradeSetupAnalyzer.Analyze(pricesBetween);
+                if (tradeSetup != null)
+                {
+                    tradeSetups.Add(tradeSetup);
                 }
             }
 
+            // Batch insert trade setups
             await _dbContext.TradeSetups.AddRangeAsync(tradeSetups);
             await _dbContext.SaveChangesAsync();
 
             return tradeSetups;
         }
 
-        public async Task DetectTradeSetupsAsync(long priceDate)
+
+        public async Task DetectTradeSetupsAsync(long? priceDate = null)
         {
             var symbols = _dbContext.Symbols.ToDictionary(stat => stat.Symbol);
             foreach (var symbol in symbols)
