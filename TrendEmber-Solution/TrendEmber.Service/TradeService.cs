@@ -333,21 +333,7 @@ namespace TrendEmber.Service
             _dbContext.SaveChanges();
         }
 
-        public void CalculatePriceHistoryShapeZScore()
-        {
-            var symbols = _dbContext.Symbols.ToDictionary(stat => stat.Symbol);
-            foreach (var priceEvent in _dbContext.EquityPrices)
-            {
-                var symbol = symbols[priceEvent.Symbol];
-                if (symbol.MeanRange.HasValue && symbol.StandardDeviation.HasValue)
-                {
-                    priceEvent.RangeZScore = CandleStickAnalyzer.CalculateZScore(priceEvent.High, priceEvent.Low, symbol.MeanRange.Value, symbol.StandardDeviation.Value);
-                    priceEvent.Shape = CandleStickAnalyzer.CalculateCandleShape(priceEvent.Open, priceEvent.Close, priceEvent.High, priceEvent.Low);
-                }
 
-            }
-            _dbContext.SaveChanges();
-        }
 
         public async Task FindPeaksAndTroughsForWatchListAsync()
         {
@@ -513,125 +499,6 @@ namespace TrendEmber.Service
             
             await _dbContext.SaveChangesAsync();
         }
-
-        public async Task DetectTradeSetups()
-        {
-            var symbols = _dbContext.Symbols.ToDictionary(stat => stat.Symbol);
-            foreach (var symbol in symbols)
-            {
-                var trades = await IdentifyTradeSetupsAsync(symbol.Value);
-            }
-
-        }
-
-        public async Task<List<TradeSetup>> IdentifyTradeSetupsAsync(WatchListSymbol symbol)
-        {
-            var tradeSetups = new List<TradeSetup>();
-
-            var history = await _dbContext.EquityPrices
-                .Where(h => h.Symbol == symbol.Symbol)
-                .OrderBy(h => h.PriceDate)
-                .ToListAsync();
-
-            for (int i = 1; i < history.Count; i++)
-            {
-                var prev = history[i - 1];
-                var curr = history[i];
-
-                // Setup 1: FullBar with Z-Score between 1.5 and 5, followed by Hammer or Doji
-                if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= 1.5 and <= 5 &&
-                    prev.Open > prev.Close &&
-                    (curr.Shape == CandleShape.Hammer || curr.Shape == CandleShape.Doji))
-                {
-                    tradeSetups.Add(new TradeSetup
-                    {
-                        Id = Guid.NewGuid(),
-                        PriceHistoryId = curr.Id,
-                        PriceHistory = curr,
-                        TradeType = TradeType.BigBarPause
-                    });
-                }
-
-                // Setup 2: FullBar with Z-Score between -0.5 and 1.4, prev closes lower, curr closes higher
-                if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= -0.5 and <= 1.4 && prev.Close < prev.Open &&
-                    (curr.Shape == CandleShape.FullBar || curr.Shape == CandleShape.TailBar) && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > curr.Open)
-                {
-                    tradeSetups.Add(new TradeSetup
-                    {
-                        Id = Guid.NewGuid(),
-                        PriceHistoryId = curr.Id,
-                        PriceHistory = curr,
-                        TradeType = TradeType.Engulfing
-                    });
-                }
-
-                // Setup 3: Doji or Hammer followed by FullBar closing higher
-                if ((prev.Shape == CandleShape.Doji || prev.Shape == CandleShape.Hammer) &&
-                    prev.RangeZScore is >= -0.5 and <= 1.4 &&
-                    curr.Shape == CandleShape.FullBar && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > prev.Close)
-                {
-                    tradeSetups.Add(new TradeSetup
-                    {
-                        Id = Guid.NewGuid(),
-                        PriceHistoryId = curr.Id,
-                        PriceHistory = curr,
-                        TradeType = TradeType.DojiConfirmed
-                    });
-                }
-
-                // Setup 4: TailBar with Z-Score 1-1.5 and closing lower, followed by FullBar
-                if (prev.Shape == CandleShape.TailBar && prev.RangeZScore is >= 1.0 and <= 1.5 && prev.Close < prev.Open &&
-                    curr.Shape == CandleShape.FullBar && curr.RangeZScore is >= -0.5 and <= 1.4 &&
-                    curr.Open < prev.Close && curr.Close >= prev.Low)
-                {
-                    tradeSetups.Add(new TradeSetup
-                    {
-                        Id = Guid.NewGuid(),
-                        PriceHistoryId = curr.Id,
-                        PriceHistory = curr,
-                        TradeType = TradeType.ContainedTailBar
-                    });
-                }
-            }
-
-            // Setup 5: Three TailBars, Dojis, or Hammers between two wavepoints
-            var wavePoints = await _dbContext.WavePoints
-                .Where(w => w.PriceHistory.Symbol == symbol.Symbol)
-                .OrderBy(w => w.PriceHistory.PriceDate)
-                .ToListAsync();
-
-            for (int i = 1; i < wavePoints.Count; i++)
-            {
-                var startWave = wavePoints[i - 1];
-                var endWave = wavePoints[i];
-
-                var barsBetween = history.Where(h => h.PriceDate > startWave.PriceHistory.PriceDate &&
-                                                     h.PriceDate < endWave.PriceHistory.PriceDate)
-                                         .ToList();
-
-                var qualifyingBars = barsBetween.Where(h =>
-                    (h.Shape == CandleShape.TailBar || h.Shape == CandleShape.Doji || h.Shape == CandleShape.Hammer) &&
-                    h.RangeZScore > 1.3 && h.Low < history[history.IndexOf(h) - 1].Low).ToList();
-
-                if (qualifyingBars.Count >= 3)
-                {
-                    tradeSetups.Add(new TradeSetup
-                    {
-                        Id = Guid.NewGuid(),
-                        PriceHistoryId = qualifyingBars.Last().Id,
-                        PriceHistory = qualifyingBars.Last(),
-                        TradeType = TradeType.ThreeTails
-                    });
-                }
-            }
-
-            await _dbContext.TradeSetups.AddRangeAsync(tradeSetups);
-            await _dbContext.SaveChangesAsync();
-
-            return tradeSetups;
-        }
-
-
 
         public async Task SimulateTrades()
         {
@@ -860,15 +727,6 @@ namespace TrendEmber.Service
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task RunWeeklyImport() {
-            //get lastrun
-            //import price histories
-            //FindPeaksAndTroughsForWatchListAsync
-            //CalculatePriceHistoryShapeZScore
-            //DetectGapsAsync
-            //DetectTradeSetups
-            //update lastrun
-        }
     }
 
 }
