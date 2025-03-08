@@ -142,10 +142,9 @@ using (var scope = app.Services.CreateScope())
         trendsDbContext.Database.Migrate();
         var tradeService = scope.ServiceProvider.GetRequiredService<ITradeService>();
         var weeklyImportService = scope.ServiceProvider.GetRequiredService<IWeeklyImportService>();
-        //await tradeService.FindPeaksAndTroughsForWatchListAsync();
-        //await tradeService.CalculateSimulationResults();
-        //await tradeService.DetectGapsAsync();
         await weeklyImportService.RunWeeklyImportAsync();
+        //await tradeService.FindPeaksAndTroughsForWatchListAsync();
+        //await tradeService.DetectGapsAsync();
     }).Wait();
 
 }

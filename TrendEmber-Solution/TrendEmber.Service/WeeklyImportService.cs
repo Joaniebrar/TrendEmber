@@ -17,7 +17,7 @@ namespace TrendEmber.Service
         private DateTime ConverUnixTimeStampToDateTime(long unixTimestampMilliseconds) =>
             DateTimeOffset.FromUnixTimeMilliseconds(unixTimestampMilliseconds).UtcDateTime;
 
-        private async Task RunAgentForWatchlistAsync(Guid watchListId, string runWeek, long unixtimestamp)
+        private async Task RunAgentForWatchlistAsync(Guid watchListId, string runWeekStart, string runWeekEnd, long unixtimestamp)
         {
 
             var watchList = await _dbContext
@@ -37,11 +37,10 @@ namespace TrendEmber.Service
                 .OrderBy(x => x.Symbol))
             {
                 var httpClient = new HttpClient();
-                var done = false;
                 try
                 {
                     var priceHistory = new List<EquityPriceHistory>();
-                    var formattedUrl = string.Format(watchList.Agent.ApiProvider.BaseUrl, symbol.Symbol, runWeek, runWeek, "w_n4F71ZNG27db1zQYcfiGBjpgF3jAJk");
+                    var formattedUrl = string.Format(watchList.Agent.ApiProvider.BaseUrl, symbol.Symbol, runWeekStart, runWeekEnd, "w_n4F71ZNG27db1zQYcfiGBjpgF3jAJk");
                     HttpResponseMessage response = await httpClient.GetAsync(formattedUrl);
                     response.EnsureSuccessStatusCode();
 
@@ -114,22 +113,20 @@ namespace TrendEmber.Service
                 .ToListAsync();
 
             // Query wave points and use AsEnumerable() to process incrementally
-            var wavePoints = await _dbContext.WavePoints
+            /*var wavePoints = await _dbContext.WavePoints
                 .Where(w => w.PriceHistory.Symbol == symbol.Symbol)
                 .OrderBy(w => w.PriceHistory.PriceDate)
                 .AsNoTracking()
                 .ToListAsync();
 
-            // Dictionary for fast lookup of equity prices by date
-            var equityPriceDict = equityPrices.ToDictionary(ep => ep.PriceDate);
 
-            int waveIndex = 0;
+            int waveIndex = 0;*/
             for (var i = 0; i < equityPrices.Count; i++)
             {
                 var currentPrice = equityPrices[i];
-
+                List<EquityPriceHistory> pricesBetween;
                 // Efficiently find the last wave point using a moving index (O(N))
-                while (waveIndex < wavePoints.Count && wavePoints[waveIndex].PriceDate <= currentPrice.PriceDate)
+                /*while (waveIndex < wavePoints.Count && wavePoints[waveIndex].PriceDate <= currentPrice.PriceDate)
                 {
                     waveIndex++;
                 }
@@ -139,10 +136,15 @@ namespace TrendEmber.Service
 
                 if (lastWavePoint != null)
                 {
-                    pricesBetween = equityPrices
-                        .Skip(i) // Start from the current price
-                        .TakeWhile(ep => ep.PriceDate <= currentPrice.PriceDate)
+                    pricesBetween = _dbContext.EquityPrices
+                        .Where(ep => ep.Symbol == symbol.Symbol && 
+                        ep.PriceDate>=lastWavePoint.PriceDate && ep.PriceDate <= currentPrice.PriceDate)
+                                        .AsNoTracking()
                         .ToList();
+                }
+                else if (priceDate.HasValue)
+                {
+                    throw new Exception("Wave points must be populated");
                 }
                 else
                 {
@@ -151,10 +153,14 @@ namespace TrendEmber.Service
                     {
                         pricesBetween.Insert(0, equityPrices[i - 1]); // Add previous price if exists
                     }
+                }*/
+                pricesBetween = new List<EquityPriceHistory> { currentPrice };
+                if (i > 0)
+                {
+                    pricesBetween.Insert(0, equityPrices[i - 1]); // Add previous price if exists
                 }
-
                 // Analyze trade setup
-                var tradeSetup = TradeSetupAnalyzer.Analyze(pricesBetween);
+                var tradeSetup = await TradeSetupAnalyzer.Analyze(pricesBetween);
                 if (tradeSetup != null)
                 {
                     tradeSetups.Add(tradeSetup);
@@ -162,8 +168,11 @@ namespace TrendEmber.Service
             }
 
             // Batch insert trade setups
-            await _dbContext.TradeSetups.AddRangeAsync(tradeSetups);
-            await _dbContext.SaveChangesAsync();
+            if (tradeSetups.Count > 0)
+            {
+                await _dbContext.TradeSetups.AddRangeAsync(tradeSetups);
+                await _dbContext.SaveChangesAsync();
+            }
 
             return tradeSetups;
         }
@@ -180,15 +189,13 @@ namespace TrendEmber.Service
         }
 
         public async Task RunWeeklyImportAsync() 
-        {
-            var lastImport = _dbContext.WeeklyImports
-                .OrderByDescending(w => w.RunFor)
-                .FirstOrDefault();
+        {            
             var watchList = _dbContext.WatchList.First();
             var weeklyImport = 1740891600000;
-            var weekInQuestion = "2025-03-06";
-            await RunAgentForWatchlistAsync(watchList.Id, weekInQuestion, weeklyImport);
-            await DetectTradeSetupsAsync(weeklyImport);
+            var weekInQuestionStart = "2025-03-02";
+            var weekInQuestionEnd = "2025-03-08";
+            //await RunAgentForWatchlistAsync(watchList.Id, weekInQuestionStart, weekInQuestionEnd, weeklyImport);
+            await DetectTradeSetupsAsync();
         }
     }
 }

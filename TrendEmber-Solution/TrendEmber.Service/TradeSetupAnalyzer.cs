@@ -17,78 +17,75 @@ namespace TrendEmber.Service
              item.Shape == CandleShape.Hammer) &&
             item.RangeZScore > 1.3;
 
-        public static TradeSetup? Analyze(List<EquityPriceHistory>? relevantHistory) 
-        {
-            if ( relevantHistory == null || relevantHistory.Count<2)
-            {
-                return null;
-            }
-            var prev = relevantHistory[0];
-            var curr = relevantHistory[1];
-
-            // Setup 1: FullBar with Z-Score between 1.5 and 5, followed by Hammer or Doji
+        public static TradeSetup? IsBigBarPauseTradeSetup(EquityPriceHistory prev, EquityPriceHistory curr)
+        {            
             if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= 1.5 and <= 5 &&
                 prev.Open > prev.Close &&
                 (curr.Shape == CandleShape.Hammer || curr.Shape == CandleShape.Doji))
             {
                 return new TradeSetup
                 {
-                    Id = Guid.NewGuid(),
                     PriceHistoryId = curr.Id,
-                    PriceHistory = curr,
                     TradeType = TradeType.BigBarPause
                 };
             }
+            return null;
+        }
 
-            // Setup 2: FullBar with Z-Score between -0.5 and 1.4, prev closes lower, curr closes higher
-            if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= -0.5 and <= 1.4 && prev.Close < prev.Open &&
-                (curr.Shape == CandleShape.FullBar || curr.Shape == CandleShape.TailBar) && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > curr.Open)
-            {
-                return new TradeSetup
-                {
-                    Id = Guid.NewGuid(),
-                    PriceHistoryId = curr.Id,
-                    PriceHistory = curr,
-                    TradeType = TradeType.Engulfing
-                };
-            }
-
-            // Setup 3: Doji or Hammer followed by FullBar closing higher
+        public static TradeSetup? IsDojiConfirmedSetup(EquityPriceHistory prev, EquityPriceHistory curr)
+        {
             if ((prev.Shape == CandleShape.Doji || prev.Shape == CandleShape.Hammer) &&
                 prev.RangeZScore is >= -0.5 and <= 1.4 &&
                 curr.Shape == CandleShape.FullBar && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > prev.Close)
             {
                 return new TradeSetup
                 {
-                    Id = Guid.NewGuid(),
                     PriceHistoryId = curr.Id,
-                    PriceHistory = curr,
                     TradeType = TradeType.DojiConfirmed
                 };
             }
+            return null;
+        }
 
-            // Setup 4: TailBar with Z-Score 1-1.5 and closing lower, followed by FullBar
+        public static TradeSetup? IsEngulfingTradeSetup(EquityPriceHistory prev, EquityPriceHistory curr)
+        {
+            if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= -0.5 and <= 1.4 && prev.Close < prev.Open &&
+                (curr.Shape == CandleShape.FullBar || curr.Shape == CandleShape.TailBar) 
+                && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > curr.Open)
+            {
+                return new TradeSetup
+                {
+                    PriceHistoryId = curr.Id,
+                    TradeType = TradeType.Engulfing
+                };
+            }
+            return null;
+        }
+
+        public static TradeSetup? IsContainedTailBarSetup(EquityPriceHistory prev, EquityPriceHistory curr)
+        {
             if (prev.Shape == CandleShape.TailBar && prev.RangeZScore is >= 1.0 and <= 1.5 && prev.Close < prev.Open &&
                 curr.Shape == CandleShape.FullBar && curr.RangeZScore is >= -0.5 and <= 1.4 &&
                 curr.Open < prev.Close && curr.Close >= prev.Low)
             {
                 return new TradeSetup
                 {
-                    Id = Guid.NewGuid(),
                     PriceHistoryId = curr.Id,
-                    PriceHistory = curr,
                     TradeType = TradeType.ContainedTailBar
                 };
             }
+            return null;
+        }
 
-
-            // Setup 5: Three TailBars, Dojis, or Hammers between two wavepoints
+        public static TradeSetup? IsThreeTailsSetup(List<EquityPriceHistory> relevantHistory)
+        {
             if (relevantHistory.Count >= 3)
             {
                 var lastItem = relevantHistory.Last();
-                if (isValidThreeTailsShape(lastItem)) {
+                if (isValidThreeTailsShape(lastItem))
+                {
                     var priorTailBars = relevantHistory
-                        .Take(relevantHistory.Count - 1) 
+                        .Take(relevantHistory.Count - 1)
                         .Where(isValidThreeTailsShape)
                         .ToList();
                     if (priorTailBars.Count >= 2)
@@ -114,18 +111,38 @@ namespace TrendEmber.Service
                         {
                             return new TradeSetup
                             {
-                                Id = Guid.NewGuid(),
                                 PriceHistoryId = lastItem.Id,
-                                PriceHistory = lastItem,
                                 TradeType = TradeType.ThreeTails
                             };
                         }
                     }
                 }
-               
             }
-            
             return null;
+        }
+
+        public static async Task<TradeSetup?> Analyze(List<EquityPriceHistory>? relevantHistory) 
+        {
+            if ( relevantHistory == null || relevantHistory.Count<2)
+            {
+                return null;
+            }
+
+            // Create tasks for each check
+            var tasks = new List<Task<TradeSetup?>>()
+            {
+                Task.Run(() => IsBigBarPauseTradeSetup(relevantHistory[0], relevantHistory[1])),
+                Task.Run(() => IsEngulfingTradeSetup(relevantHistory[0], relevantHistory[1])),
+                Task.Run(() => IsDojiConfirmedSetup(relevantHistory[0], relevantHistory[1])),
+                Task.Run(() => IsContainedTailBarSetup(relevantHistory[0], relevantHistory[1])),
+                Task.Run(() => IsThreeTailsSetup(relevantHistory))
+            };
+
+            // Wait for the first completed task that returns a non-null result
+            var results = await Task.WhenAll(tasks);
+
+            // Return the result of the first task that returns a non-null TradeSetup
+            return results.FirstOrDefault(x => x != null);
         }
     }
 }

@@ -407,6 +407,8 @@ namespace TrendEmber.Service
         }
         public async Task DetectGapsForEqutiyAsync(WatchListSymbol symbol)
         {
+            await _dbContext.PriceGapEvents.ExecuteDeleteAsync();
+            await _dbContext.SaveChangesAsync();
             var history = await _dbContext.EquityPrices
                 .Where(h => h.Symbol == symbol.Symbol)
                 .OrderBy(h => h.PriceDate)
