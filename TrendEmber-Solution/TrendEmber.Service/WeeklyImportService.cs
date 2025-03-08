@@ -40,7 +40,7 @@ namespace TrendEmber.Service
                 try
                 {
                     var priceHistory = new List<EquityPriceHistory>();
-                    var formattedUrl = string.Format(watchList.Agent.ApiProvider.BaseUrl, symbol.Symbol, runWeekStart, runWeekEnd, "w_n4F71ZNG27db1zQYcfiGBjpgF3jAJk");
+                    var formattedUrl = string.Format(watchList.Agent.ApiProvider.BaseUrl, symbol.Symbol, runWeekStart, runWeekEnd, "");
                     HttpResponseMessage response = await httpClient.GetAsync(formattedUrl);
                     response.EnsureSuccessStatusCode();
 
@@ -112,55 +112,24 @@ namespace TrendEmber.Service
                 .AsNoTracking()
                 .ToListAsync();
 
-            // Query wave points and use AsEnumerable() to process incrementally
-            /*var wavePoints = await _dbContext.WavePoints
-                .Where(w => w.PriceHistory.Symbol == symbol.Symbol)
-                .OrderBy(w => w.PriceHistory.PriceDate)
-                .AsNoTracking()
-                .ToListAsync();
-
-
-            int waveIndex = 0;*/
             for (var i = 0; i < equityPrices.Count; i++)
             {
                 var currentPrice = equityPrices[i];
                 List<EquityPriceHistory> pricesBetween;
-                // Efficiently find the last wave point using a moving index (O(N))
-                /*while (waveIndex < wavePoints.Count && wavePoints[waveIndex].PriceDate <= currentPrice.PriceDate)
-                {
-                    waveIndex++;
-                }
-                var lastWavePoint = waveIndex > 0 ? wavePoints[waveIndex - 1] : null;
 
-                List<EquityPriceHistory> pricesBetween;
-
-                if (lastWavePoint != null)
-                {
-                    pricesBetween = _dbContext.EquityPrices
-                        .Where(ep => ep.Symbol == symbol.Symbol && 
-                        ep.PriceDate>=lastWavePoint.PriceDate && ep.PriceDate <= currentPrice.PriceDate)
-                                        .AsNoTracking()
-                        .ToList();
-                }
-                else if (priceDate.HasValue)
-                {
-                    throw new Exception("Wave points must be populated");
-                }
-                else
-                {
-                    pricesBetween = new List<EquityPriceHistory> { currentPrice };
-                    if (i > 0)
-                    {
-                        pricesBetween.Insert(0, equityPrices[i - 1]); // Add previous price if exists
-                    }
-                }*/
                 pricesBetween = new List<EquityPriceHistory> { currentPrice };
                 if (i > 0)
                 {
                     pricesBetween.Insert(0, equityPrices[i - 1]); // Add previous price if exists
                 }
+
+                var lastPeakWavePoint = await _dbContext.WavePoints
+                    .Where(w => w.SymbolId == symbol.Id && w.PriceDate < currentPrice.PriceDate && w.Type == WaveType.Peak)
+                    .OrderByDescending(w => w.PriceDate)
+                    .FirstOrDefaultAsync();
+
                 // Analyze trade setup
-                var tradeSetup = await TradeSetupAnalyzer.Analyze(pricesBetween);
+                var tradeSetup = await TradeSetupAnalyzer.Analyze(pricesBetween, lastPeakWavePoint);
                 if (tradeSetup != null)
                 {
                     tradeSetups.Add(tradeSetup);

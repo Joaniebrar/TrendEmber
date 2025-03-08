@@ -57,5 +57,12 @@ namespace TrendEmber.Service.Tests
         {
             CandleStickAnalyzer.CalculateCandleShape(open, close, high, low).Should().Be(expectedResult);
         }
+
+        [Test]
+        public void CalculateZScore_ValidInputs_ShouldReturnExpectedResults()
+        {
+            var result = CandleStickAnalyzer.CalculateZScore(7.61m, 7.25m, 0.6030235849056604, 0.2725400547165211);
+            result.Should().Be(-0.8916985987928937);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,9 +122,14 @@ namespace TrendEmber.Service
             return null;
         }
 
-        public static async Task<TradeSetup?> Analyze(List<EquityPriceHistory>? relevantHistory) 
+        public static async Task<TradeSetup?> Analyze(List<EquityPriceHistory>? relevantHistory, WavePoint? lastPeak) 
         {
             if ( relevantHistory == null || relevantHistory.Count<2)
+            {
+                return null;
+            }
+
+            if (lastPeak != null && lastPeak.Price < relevantHistory[0].Close * 1.03m)
             {
                 return null;
             }
