@@ -7,7 +7,31 @@ namespace TrendEmber.Service.Tests
     [TestFixture]
     public class TradeSetupAnalyzerTests
     {
-        
+        /*
+ * 
+select sy."Symbol",wp."Price",wp."PriceDate" from public."WavePoints" wp
+inner join public."Symbols" sy on wp."SymbolId" = sy."Id"
+where sy."Symbol" = 'CCL'
+and "PriceDate" <= '2024-04-22 22:00:00-06' and "Type"=0
+order by "PriceDate" desc
+
+SELECT "PriceDate",
+'new EquityPriceHistory() {' ||
+' Symbol = "' || "Symbol" || '", ' ||
+' Open = ' || "Open" || 'm, ' ||
+' Close = ' || "Close" || 'm, ' ||
+' High = ' || "High" || 'm, ' ||
+' Low = ' || "Low" || 'm, ' ||
+' RangeZScore = ' || "RangeZScore" || ', ' ||
+' PriceDate = DateTimeOffset.Parse("' || "PriceDate" || '").DateTime, ' ||
+' Shape = CandleShape.' || "Shape" || ' ' ||
+'},'
+FROM public."EquityPrices"
+WHERE "Symbol" = 'CCL'
+AND "PriceDate" <= '2024-04-22 22:00:00-06'
+ORDER BY "PriceDate" DESC;
+
+ * */
         [Test]
         public async Task AnalyzeJuly62024BITO_WithValidInputs_ShouldReturnTradeSetup()
         {
@@ -103,5 +127,103 @@ namespace TrendEmber.Service.Tests
             result.Should().NotBeNull();
         }
 
+        [Test]
+        public async Task AnalyzeSeptember07202024SNOW_WithValidInputs_ShouldReturnTradeSetup()
+        {
+            var relevantHistory = new List<EquityPriceHistory>() {
+                new EquityPriceHistory() { Symbol = "SNOW",  
+                    Open = 113.06m,  Close = 108.56m,  High = 114.73m,  Low = 107.13m,  
+                    RangeZScore = -0.9224019477195047,  
+                    PriceDate = DateTimeOffset.Parse("2024-08-31 22:00:00-06").DateTime,  Shape = CandleShape.FullBar },
+                new EquityPriceHistory() { Symbol = "SNOW",  
+                    Open = 109.32m,  Close = 113.67m,  High = 115.04m,  Low = 108.13m,  
+                    RangeZScore = -1.0064650057006788,  
+                    PriceDate = DateTimeOffset.Parse("2024-09-07 22:00:00-06").DateTime,  
+                    Shape = CandleShape.FullBar },
+            };
+            var lastPeak = new WavePoint()
+            {
+                Price = 128.56m,
+                PriceDate = DateTimeOffset.Parse("2024-08-17 22:00:00-06").DateTime
+            };
+
+            var result = await TradeSetupAnalyzer.Analyze(relevantHistory, lastPeak);
+            result.Should().NotBeNull();
+        }
+
+        [Test]
+        public async Task AnalyzeAugust3202024SIRI_WithValidInputs_ShouldReturnTradeSetup()
+        {
+            var relevantHistory = new List<EquityPriceHistory>() {
+                new EquityPriceHistory() { Symbol = "SIRI",  
+                    Open = 36.4m,  Close = 31.2m,  High = 36.9m,  Low = 30.65m,  
+                    RangeZScore = 0.4570077974275946,  
+                    PriceDate = DateTimeOffset.Parse("2024-07-27 22:00:00-06").DateTime,  
+                    Shape = CandleShape.FullBar },
+                new EquityPriceHistory() { Symbol = "SIRI",  
+                    Open = 28.8m,  Close = 31.4m,  High = 32m,  Low = 28.6m,  
+                    RangeZScore = -0.22999533257647725,  
+                    PriceDate = DateTimeOffset.Parse("2024-08-03 22:00:00-06").DateTime,  
+                    Shape = CandleShape.FullBar },
+            };
+            var lastPeak = new WavePoint()
+            {
+                Price = 37.2m,
+                PriceDate = DateTimeOffset.Parse("2024-07-20 22:00:00-06").DateTime
+            };
+
+            var result = await TradeSetupAnalyzer.Analyze(relevantHistory, lastPeak);
+            result.Should().BeNull();
+        }
+
+        [Test]
+        public async Task AnalyzeSeptember28202024CSGP_WithValidInputs_ShouldReturnTradeSetup()
+        {
+            var relevantHistory = new List<EquityPriceHistory>() {
+                new EquityPriceHistory() { Symbol = "CSGP",  
+                    Open = 77.8m,  Close = 75.01m,  High = 78.27m,  Low = 73.59m,  
+                    RangeZScore = 0.017807446920621695,  
+                    PriceDate = DateTimeOffset.Parse("2024-09-21 22:00:00-06").DateTime,  
+                    Shape = CandleShape.FullBar },
+                new EquityPriceHistory() { Symbol = "CSGP",  
+                    Open = 74.95m,  Close = 74.1m,  High = 75.67m,  Low = 73.15m,  
+                    RangeZScore = -0.9376976542426743,  
+                    PriceDate = DateTimeOffset.Parse("2024-09-28 22:00:00-06").DateTime,  
+                    Shape = CandleShape.TailBar },
+            };
+            var lastPeak = new WavePoint()
+            {
+                Price = 79.86m,
+                PriceDate = DateTimeOffset.Parse("2024-09-14 22:00:00-06").DateTime
+            };
+
+            var result = await TradeSetupAnalyzer.Analyze(relevantHistory, lastPeak);
+            result.Should().BeNull();
+        }
+
+        [Test]
+        public async Task AnalyzeAugust10202024EL_WithValidInputs_ShouldReturnTradeSetup()
+        {
+            var relevantHistory = new List<EquityPriceHistory>() {
+                new EquityPriceHistory() { Symbol = "EL",  
+                    Open = 91.17m,  Close = 89.15m,  High = 94.81m,  Low = 88.94m,  
+                    RangeZScore = -0.6123470220645716,  
+                    PriceDate = DateTimeOffset.Parse("2024-08-03 22:00:00-06").DateTime,  
+                    Shape = CandleShape.Unknown },
+                new EquityPriceHistory() { Symbol = "EL",  
+                    Open = 89.15m,  Close = 94.97m,  High = 96.31m,  Low = 86.05m,  
+                    RangeZScore = -0.005876299357472126,  
+                    PriceDate = DateTimeOffset.Parse("2024-08-10 22:00:00-06").DateTime,  
+                    Shape = CandleShape.FullBar },
+            };
+            var lastPeak = new WavePoint()
+            {
+                Price = 147.45m,
+                PriceDate = DateTimeOffset.Parse("2024-04-20 22:00:00-06").DateTime
+            };
+
+            var result = await TradeSetupAnalyzer.Analyze(relevantHistory, lastPeak);
+            result.Should().NotBeNull();
+        }
     }
 }

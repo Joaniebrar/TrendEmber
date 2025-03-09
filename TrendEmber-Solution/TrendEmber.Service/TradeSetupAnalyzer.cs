@@ -1,40 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TrendEmber.Core;
+﻿using TrendEmber.Core;
 using TrendEmber.Core.Trends;
 
 namespace TrendEmber.Service
 {
-    /*
-     * 
-select sy."Symbol",wp."Price",wp."PriceDate" from public."WavePoints" wp
-inner join public."Symbols" sy on wp."SymbolId" = sy."Id"
-where sy."Symbol" = 'CCL'
-and "PriceDate" <= '2024-04-22 22:00:00-06' and "Type"=0
-order by "PriceDate" desc
 
-SELECT "PriceDate",
-    'new EquityPriceHistory() {' ||
-    ' Symbol = "' || "Symbol" || '", ' ||
-    ' Open = ' || "Open" || 'm, ' ||
-    ' Close = ' || "Close" || 'm, ' ||
-    ' High = ' || "High" || 'm, ' ||
-    ' Low = ' || "Low" || 'm, ' ||
-    ' RangeZScore = ' || "RangeZScore" || ', ' ||
-    ' PriceDate = DateTimeOffset.Parse("' || "PriceDate" || '").DateTime, ' ||
-    ' Shape = CandleShape.' || "Shape" || ' ' ||
-    '},'
-FROM public."EquityPrices"
-WHERE "Symbol" = 'CCL'
-AND "PriceDate" <= '2024-04-22 22:00:00-06'
-ORDER BY "PriceDate" DESC;
-
-     * */
     public static class TradeSetupAnalyzer
     {
         private static Func<EquityPriceHistory, bool> isValidThreeTailsShape = item =>
@@ -62,7 +31,7 @@ ORDER BY "PriceDate" DESC;
         {
             if ((prev.Shape == CandleShape.Doji || prev.Shape == CandleShape.Hammer) &&
                 prev.RangeZScore is >= -0.5 and <= 1.4 &&
-                curr.Shape == CandleShape.FullBar && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > prev.Close)
+                curr.Shape == CandleShape.FullBar && curr.RangeZScore is >= -1.05 and <= 1.4 && curr.Close > prev.Close)
             {
                 return new TradeSetup
                 {
@@ -75,23 +44,30 @@ ORDER BY "PriceDate" DESC;
 
         public static TradeSetup? IsEngulfingTradeSetup(EquityPriceHistory prev, EquityPriceHistory curr)
         {
-            if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= -0.825 and <= 1.4 && prev.Close < prev.Open &&
+            if (prev.Shape != CandleShape.Hammer && prev.Shape != CandleShape.Doji && prev.RangeZScore is >= -1.05 and <= 1.4 
+                && prev.Close < prev.Open &&
                 (curr.Shape == CandleShape.FullBar || curr.Shape == CandleShape.TailBar) 
-                && curr.RangeZScore is >= -0.825 and <= 1.4 && curr.Close > curr.Open)
+                && curr.RangeZScore is >= -1.05 and <= 1.4 && curr.Close > curr.Open)
             {
-                return new TradeSetup
+                decimal halfwayMark = (prev.Open - prev.Close) / 2;
+
+                // Ensure current close is above the halfway mark
+                if (curr.Close > prev.Close + halfwayMark)
                 {
-                    PriceHistoryId = curr.Id,
-                    TradeType = TradeType.Engulfing
-                };
+                    return new TradeSetup
+                    {
+                        PriceHistoryId = curr.Id,
+                        TradeType = TradeType.Engulfing
+                    };
+                }
             }
             return null;
         }
 
         public static TradeSetup? IsContainedTailBarSetup(EquityPriceHistory prev, EquityPriceHistory curr)
         {
-            if (prev.Shape == CandleShape.TailBar && prev.RangeZScore is >= 1.0 and <= 1.5 && prev.Close < prev.Open &&
-                curr.Shape == CandleShape.FullBar && curr.RangeZScore is >= -0.5 and <= 1.4 &&
+            if (prev.Shape == CandleShape.TailBar || prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= 1.0 and <= 1.5 && prev.Close < prev.Open &&
+                curr.RangeZScore is >= -1.05 and <= 1.4 &&
                 curr.Open < prev.Close && curr.Close >= prev.Low)
             {
                 return new TradeSetup
