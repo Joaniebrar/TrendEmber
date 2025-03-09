@@ -10,6 +10,31 @@ using TrendEmber.Core.Trends;
 
 namespace TrendEmber.Service
 {
+    /*
+     * 
+select sy."Symbol",wp."Price",wp."PriceDate" from public."WavePoints" wp
+inner join public."Symbols" sy on wp."SymbolId" = sy."Id"
+where sy."Symbol" = 'CCL'
+and "PriceDate" <= '2024-04-22 22:00:00-06' and "Type"=0
+order by "PriceDate" desc
+
+SELECT "PriceDate",
+    'new EquityPriceHistory() {' ||
+    ' Symbol = "' || "Symbol" || '", ' ||
+    ' Open = ' || "Open" || 'm, ' ||
+    ' Close = ' || "Close" || 'm, ' ||
+    ' High = ' || "High" || 'm, ' ||
+    ' Low = ' || "Low" || 'm, ' ||
+    ' RangeZScore = ' || "RangeZScore" || ', ' ||
+    ' PriceDate = DateTimeOffset.Parse("' || "PriceDate" || '").DateTime, ' ||
+    ' Shape = CandleShape.' || "Shape" || ' ' ||
+    '},'
+FROM public."EquityPrices"
+WHERE "Symbol" = 'CCL'
+AND "PriceDate" <= '2024-04-22 22:00:00-06'
+ORDER BY "PriceDate" DESC;
+
+     * */
     public static class TradeSetupAnalyzer
     {
         private static Func<EquityPriceHistory, bool> isValidThreeTailsShape = item =>
@@ -20,7 +45,7 @@ namespace TrendEmber.Service
 
         public static TradeSetup? IsBigBarPauseTradeSetup(EquityPriceHistory prev, EquityPriceHistory curr)
         {            
-            if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= 1.5 and <= 5 &&
+            if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= 1.12 and <= 5 &&
                 prev.Open > prev.Close &&
                 (curr.Shape == CandleShape.Hammer || curr.Shape == CandleShape.Doji))
             {
@@ -50,9 +75,9 @@ namespace TrendEmber.Service
 
         public static TradeSetup? IsEngulfingTradeSetup(EquityPriceHistory prev, EquityPriceHistory curr)
         {
-            if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= -0.5 and <= 1.4 && prev.Close < prev.Open &&
+            if (prev.Shape == CandleShape.FullBar && prev.RangeZScore is >= -0.825 and <= 1.4 && prev.Close < prev.Open &&
                 (curr.Shape == CandleShape.FullBar || curr.Shape == CandleShape.TailBar) 
-                && curr.RangeZScore is >= -0.5 and <= 1.4 && curr.Close > curr.Open)
+                && curr.RangeZScore is >= -0.825 and <= 1.4 && curr.Close > curr.Open)
             {
                 return new TradeSetup
                 {
@@ -129,7 +154,7 @@ namespace TrendEmber.Service
                 return null;
             }
 
-            if (lastPeak != null && lastPeak.Price < relevantHistory[0].Close * 1.03m)
+            if (lastPeak != null && lastPeak.Price < relevantHistory[1].Close * 1.03m)
             {
                 return null;
             }

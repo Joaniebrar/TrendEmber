@@ -94,18 +94,13 @@ namespace TrendEmber.Service
             return currentDate.AddDays(-daysToSubtract);
         }
 
-        public async Task<List<TradeSetup>> IdentifyTradeSetupsAsync(WatchListSymbol symbol, long? priceDate)
+        public async Task<List<TradeSetup>> IdentifyTradeSetupsAsync(WatchListSymbol symbol)
         {
             var tradeSetups = new List<TradeSetup>();
 
             // Query equity prices
             var equityPricesQuery = _dbContext.EquityPrices
                 .Where(h => h.Symbol == symbol.Symbol);
-
-            if (priceDate.HasValue)
-            {
-                equityPricesQuery = equityPricesQuery.Where(h => h.RawPriceDatee == priceDate.Value);
-            }
 
             var equityPrices = await equityPricesQuery
                 .OrderBy(h => h.PriceDate)
@@ -136,6 +131,7 @@ namespace TrendEmber.Service
                 }
             }
 
+
             // Batch insert trade setups
             if (tradeSetups.Count > 0)
             {
@@ -146,13 +142,70 @@ namespace TrendEmber.Service
             return tradeSetups;
         }
 
+        public async Task IdentifyTradeSetupsForPriceDateAsync(WatchListSymbol symbol, long priceDate)
+        {
 
-        public async Task DetectTradeSetupsAsync(long? priceDate = null)
+            // Query equity prices
+            var prices = await _dbContext.EquityPrices
+                .Where(h => h.Symbol == symbol.Symbol && h.RawPriceDatee <= priceDate)
+                .OrderByDescending(h => h.RawPriceDatee)
+                .Take(2)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var currentPrice = prices.FirstOrDefault(p => p.RawPriceDatee == priceDate);
+            var previousPrice = prices.FirstOrDefault(p => p.RawPriceDatee != priceDate);
+
+            if (currentPrice == null)
+            {
+                Console.WriteLine($"The priceDate was not found for {symbol.Symbol}");
+                return;
+            }
+
+            await _dbContext.TradeSetups.Where(x => x.PriceHistoryId == currentPrice.Id).ExecuteDeleteAsync();
+            await _dbContext.SaveChangesAsync();
+          
+            List<EquityPriceHistory> pricesBetween;
+
+            pricesBetween = new List<EquityPriceHistory> { currentPrice };
+            if (previousPrice != null)
+            {
+                pricesBetween.Insert(0, previousPrice);
+            }
+
+            var lastPeakWavePoint = await _dbContext.WavePoints
+                .Where(w => w.SymbolId == symbol.Id && w.PriceDate < currentPrice.PriceDate && w.Type == WaveType.Peak)
+                .OrderByDescending(w => w.PriceDate)
+                .FirstOrDefaultAsync();
+
+            // Analyze trade setup
+            var tradeSetup = await TradeSetupAnalyzer.Analyze(pricesBetween, lastPeakWavePoint);
+            if (tradeSetup != null)
+            {
+                await _dbContext.TradeSetups.AddAsync(tradeSetup);
+                await _dbContext.SaveChangesAsync();
+            }            
+        }
+
+
+        public async Task DetectTradeSetupsAsync()
+        {
+            await _dbContext.TradeSetups.ExecuteDeleteAsync();
+            await _dbContext.SaveChangesAsync();
+            var symbols = _dbContext.Symbols.ToDictionary(stat => stat.Symbol);
+            foreach (var symbol in symbols)
+            {
+                var trades = await IdentifyTradeSetupsAsync(symbol.Value);
+            }
+
+        }
+
+        public async Task DetectTradeSetupsForPriceDateAsync(long priceDate)
         {
             var symbols = _dbContext.Symbols.ToDictionary(stat => stat.Symbol);
             foreach (var symbol in symbols)
             {
-                var trades = await IdentifyTradeSetupsAsync(symbol.Value, priceDate);
+                await IdentifyTradeSetupsForPriceDateAsync(symbol.Value, priceDate);
             }
 
         }
@@ -165,6 +218,7 @@ namespace TrendEmber.Service
             var weekInQuestionEnd = "2025-03-08";
             //await RunAgentForWatchlistAsync(watchList.Id, weekInQuestionStart, weekInQuestionEnd, weeklyImport);
             await DetectTradeSetupsAsync();
+            //await DetectTradeSetupsForPriceDateAsync(weeklyImport);
         }
     }
 }
