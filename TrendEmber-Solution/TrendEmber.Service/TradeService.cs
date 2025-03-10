@@ -305,7 +305,7 @@ namespace TrendEmber.Service
             await _dbContext.SaveChangesAsync();
         }
 
-        public void CalculateMeanAndStandardDeviation()
+        public async Task CalculateMeanAndStandardDeviation()
         {
             var calculatedResults = _dbContext.EquityPrices
                 .AsEnumerable()
@@ -330,7 +330,7 @@ namespace TrendEmber.Service
                 symbol.MeanRange = symbolStats.Mean;
                 symbol.StandardDeviation = symbolStats.StandardDeviation;
             }
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
 
@@ -354,6 +354,36 @@ namespace TrendEmber.Service
             }
 
         }
+        public static decimal CalculateWavePrice(EquityPriceHistory candle, WaveType waveType)
+        {
+            if (waveType == WaveType.Peak)
+            {
+                if (candle.Close > candle.Open)
+                {
+                    return candle.Close;
+                }
+                else
+                {
+                    return candle.Open;
+                }
+            }
+            else {
+                if ((CandleStickAnalyzer.IsDoji(candle.Open, candle.Close, candle.High, candle.Low) ||
+                    CandleStickAnalyzer.IsTailBar(candle.Open, candle.Close, candle.High, candle.Low)) 
+                    && (candle.RangeZScore is >= -1.4 and <= 1.4))
+                {
+                    return candle.Low;
+                }
+                else if (candle.Close > candle.Open)
+                {
+                    return candle.Open;
+                }
+                else
+                {
+                    return candle.Close;
+                }
+            }
+        }
         public async Task<List<WavePoint>> FindPeaksAndTroughs(List<EquityPriceHistory> prices, Guid symbolId, int lookback = 2)
         {
             var peaksAndTroughs = new List<WavePoint>();
@@ -375,7 +405,7 @@ namespace TrendEmber.Service
                         SymbolId = symbolId,
                         PriceDate = prices[i].PriceDate,
                         Type = WaveType.Peak,
-                        Price = currentHigh,
+                        Price = CalculateWavePrice(prices[i], WaveType.Peak),
                         PriceHistoryId = prices[i].Id
                     });
 
@@ -385,7 +415,7 @@ namespace TrendEmber.Service
                         SymbolId = symbolId,
                         PriceDate = prices[i].PriceDate,
                         Type = WaveType.Trough,
-                        Price = currentLow,
+                        Price = CalculateWavePrice(prices[i], WaveType.Trough),
                         PriceHistoryId = prices[i].Id
                     });
             }
@@ -407,6 +437,8 @@ namespace TrendEmber.Service
         }
         public async Task DetectGapsForEqutiyAsync(WatchListSymbol symbol)
         {
+            await _dbContext.PriceGapEvents.ExecuteDeleteAsync();
+            await _dbContext.SaveChangesAsync();
             var history = await _dbContext.EquityPrices
                 .Where(h => h.Symbol == symbol.Symbol)
                 .OrderBy(h => h.PriceDate)
